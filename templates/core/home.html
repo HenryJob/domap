@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load morde_extras %}
+{% block title %}Mordé · Waffles saludables hechos a base de garbanzo{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-6">
+      <h1 class="display-4 fw-bold">Waffles saludables<br>
+        <span style="color: var(--color-amber-dark);">hechos a base de garbanzo</span>
+      </h1>
+      <p class="lead text-muted mt-3">Disfruta un antojo dorado, nutritivo y práctico desde casa.</p>
+      <div class="d-flex gap-3 flex-wrap mt-4">
+        <a href="{% url 'orders:checkout' %}" class="btn-morde-dark">Quiero pedir</a>
+        <a href="{% url 'catalog:menu' %}" class="btn-morde-light">Ver menú</a>
+      </div>
+      <p class="small text-muted mt-3">🛵 Delivery y recojo coordinado</p>
+    </div>
+    <div class="col-lg-6">
+      <img src="https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=900&q=80"
+           alt="Waffle Mordé" class="img-fluid rounded-4 shadow">
+    </div>
+  </div>
+</section>
+
+<section class="container py-4" id="beneficios">
+  <h2 class="text-center mb-5">Rico, nutritivo y práctico <span class="divider-heart"></span></h2>
+  <div class="row g-4 text-center">
+    <div class="col-6 col-md-3">
+      <div class="icon-badge">🫘</div>
+      <h6>Proteína vegetal</h6>
+      <p class="small text-muted">Hecho a base de garbanzo, fuente natural de proteína.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge">🌾</div>
+      <h6>Fibra y saciedad</h6>
+      <p class="small text-muted">Aporta fibra que ayuda a sentirte bien por más tiempo.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge">🍽️</div>
+      <h6>Práctico y rápido</h6>
+      <p class="small text-muted">Pide desde donde estés. Delivery y recojo coordinado.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge">💛</div>
+      <h6>Antojo sin culpa</h6>
+      <p class="small text-muted">Disfruta algo dulce con mejor perfil nutricional.</p>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <h2 class="text-center mb-5">Descubre nuestros waffles <span class="divider-heart"></span></h2>
+  <div class="row g-4">
+    {% for product in featured_products %}
+      <div class="col-6 col-md-3">
+        <div class="product-card">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+          {% else %}
+            <img src="https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=500&q=80" alt="{{ product.name }}">
+          {% endif %}
+          <div class="p-3 text-center">
+            <h6 class="mb-1">{{ product.name|cut:"Mordé " }}</h6>
+            <p class="small text-muted mb-0">{{ product.description }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  <div class="text-center mt-4">
+    <a href="{% url 'catalog:menu' %}" class="btn-morde-light">Ver menú completo</a>
+  </div>
+</section>
+
+{% include 'partials/steps_band.html' with steps=home_steps %}
+
+<section class="container py-5" id="nosotros">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-5">
+      <img src="https://images.unsplash.com/photo-1515543904379-3d757afe72e4?w=700&q=80"
+           class="img-fluid rounded-4" alt="Garbanzo">
+    </div>
+    <div class="col-lg-7">
+      <h2>El poder del garbanzo <span class="divider-heart"></span></h2>
+      <p class="text-muted">Usamos garbanzo porque creemos en ingredientes naturales que nutren tu cuerpo y te hacen sentir bien.</p>
+      <div class="row g-3 mt-2">
+        <div class="col-4 text-center">
+          <div class="icon-badge">💪</div>
+          <p class="small mb-0">Buena fuente de proteína vegetal</p>
+        </div>
+        <div class="col-4 text-center">
+          <div class="icon-badge">🌾</div>
+          <p class="small mb-0">Alto en fibra</p>
+        </div>
+        <div class="col-4 text-center">
+          <div class="icon-badge">💧</div>
+          <p class="small mb-0">Ingredientes reales y de calidad</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% url 'orders:checkout' as checkout_url %}
+{% include 'partials/cta_banner.html' with heading='¿Listo para tu Mordé?' subheading='Elige tu forma de pedido favorita.' cta_left_label='Pedir por WhatsApp' cta_right_label='Pedir en la web' cta_right_url=checkout_url %}
+{% endblock %}

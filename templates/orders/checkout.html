@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static widget_tweaks morde_extras %}
+{% block title %}Pedidos · Mordé{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-6">
+      <h1 class="display-5 fw-bold">Haz tu pedido</h1>
+      <p class="lead" style="color: var(--color-amber-dark);">Elige tu Mordé favorito y selecciona la forma de pedido que más te convenga.</p>
+      <p class="text-muted">Disfruta nuestros waffles saludables, hechos a base de garbanzo, preparados al momento con ingredientes naturales y mucho amor. Tú eliges cómo pedir, nosotros lo preparamos fresco para ti.</p>
+    </div>
+    <div class="col-lg-6">
+      <img src="https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=900&q=80" alt="Waffle Mordé" class="img-fluid rounded-4 shadow">
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <h2 class="text-center mb-5">¿Cómo quieres pedir? <span class="divider-heart"></span></h2>
+  <div class="row g-4 justify-content-center">
+    <div class="col-md-5">
+      <div class="product-card p-4 text-center h-100">
+        <div class="icon-badge mx-auto" style="font-size:1.8rem;">💬</div>
+        <h5>Pedir por WhatsApp</h5>
+        <p class="small text-muted">Escríbenos directamente, confirma detalles, consulta disponibilidad y coordina tu pedido de forma rápida y personalizada.</p>
+        <a href="{% whatsapp_order_link %}" target="_blank" rel="noopener" class="btn-morde-dark js-whatsapp-cta">Pedir por WhatsApp</a>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="product-card p-4 text-center h-100">
+        <div class="icon-badge mx-auto" style="font-size:1.8rem;">🛒</div>
+        <h5>Comprar en la web</h5>
+        <p class="small text-muted">Agrega tus productos al carrito, completa tus datos y realiza tu pedido directamente en nuestro sitio web.</p>
+        <a href="#comprar" class="btn-morde-light">Comprar en la web</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5" id="comprar">
+  <h2 class="text-center mb-5">Completa tu pedido <span class="divider-heart"></span></h2>
+
+  {% if cart_lines %}
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <form method="post" class="product-card p-4">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Nombre completo</label>
+            {{ form.customer_name|add_class:"form-control" }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Teléfono</label>
+            {{ form.phone|add_class:"form-control" }}
+          </div>
+          <div class="col-12">
+            <label class="form-label d-block">Tipo de pedido</label>
+            <div class="toggle-options">
+              {% for radio in form.order_type %}
+                {{ radio.tag }}
+                <label class="btn-toggle-option" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Dirección o punto de referencia</label>
+            {{ form.address|add_class:"form-control" }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Fecha</label>
+            {{ form.scheduled_date|add_class:"form-control" }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Hora</label>
+            {{ form.scheduled_time|add_class:"form-control" }}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Notas del pedido (opcional)</label>
+            {{ form.notes|add_class:"form-control" }}
+          </div>
+          <div class="col-12">
+            <label class="form-label d-block">Método de pago</label>
+            <div class="toggle-options">
+              {% for radio in form.payment_method %}
+                {{ radio.tag }}
+                <label class="btn-toggle-option" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger mt-3">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <button type="submit" class="btn-morde-amber mt-4 w-100 justify-content-center">🔒 Confirmar pedido</button>
+        <p class="small text-muted text-center mt-2 mb-0">Tus datos están protegidos</p>
+      </form>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="product-card p-4" id="order-summary" style="position: sticky; top: 1rem;">
+        {% include 'orders/_summary_partial.html' %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+    <div class="text-center py-5">
+      <p class="text-muted">Tu carrito está vacío. Ve al <a href="{% url 'catalog:menu' %}">menú</a> y elige tu Mordé favorito.</p>
+    </div>
+  {% endif %}
+</section>
+
+{% include 'partials/steps_band.html' with steps=pedidos_steps %}
+
+<section class="container py-5">
+  <div class="row g-4 text-center">
+    <div class="col-6 col-md-3">
+      <div class="icon-badge">🍽️</div>
+      <h6>Preparado al momento</h6>
+      <p class="small text-muted">Waffles hechos al instante para máxima frescura.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge">🛵</div>
+      <h6>Delivery y recojo coordinado</h6>
+      <p class="small text-muted">Llegamos a tiempo o te esperamos listo para recoger.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge">💛</div>
+      <h6>Atención cercana</h6>
+      <p class="small text-muted">Te asesoramos y atendemos con amabilidad siempre.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge">🌿</div>
+      <h6>Ingredientes seleccionados</h6>
+      <p class="small text-muted">Usamos ingredientes naturales, saludables y de calidad.</p>
+    </div>
+  </div>
+</section>
+
+{% url 'orders:checkout' as checkout_url %}
+{% include 'partials/cta_banner.html' with heading='¿Lista/o para tu Mordé?' subheading='Elige cómo pedir y disfruta de waffles saludables, hechos con amor.' cta_left_label='Pedir por WhatsApp' cta_right_label='Comprar en la web' cta_right_url=checkout_url %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cart.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endblock %}

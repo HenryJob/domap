@@ -1,0 +1,33 @@
+{% load morde_extras %}
+<footer class="morde-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-3">
+        <span class="morde-logo" style="color: var(--color-brown);">Mordé</span>
+        <p class="small text-muted mt-2">Waffles saludables hechos a base de garbanzo.</p>
+      </div>
+      <div class="col-md-3">
+        <h6>Navegación</h6>
+        <ul class="list-unstyled small">
+          <li><a href="{% url 'core:home' %}">Inicio</a></li>
+          <li><a href="{% url 'core:home' %}#nosotros">Nosotros</a></li>
+          <li><a href="{% url 'catalog:menu' %}">Menú</a></li>
+          <li><a href="{% url 'core:home' %}#beneficios">Beneficios</a></li>
+          <li><a href="{% url 'orders:checkout' %}">Pedidos</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6>Atención</h6>
+        <p class="small text-muted mb-1">Delivery y recojo coordinado</p>
+        <p class="small text-muted mb-1">Lunes a Domingo · 8:00 a.m. – 9:00 p.m.</p>
+        <p class="small text-muted">+51 999 999 999</p>
+      </div>
+      <div class="col-md-3">
+        <h6>Nuestro punto</h6>
+        <p class="small text-muted">Recojo en punto coordinado · Miraflores, Lima</p>
+      </div>
+    </div>
+    <hr class="my-4">
+    <p class="small text-muted text-center mb-0">© 2024 Mordé. Todos los derechos reservados.</p>
+  </div>
+</footer>

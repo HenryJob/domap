@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static morde_extras %}
+{% block title %}Menú · Mordé{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-6">
+      <h1 class="display-5 fw-bold">Nuestro menú</h1>
+      <p class="lead" style="color: var(--color-amber-dark);">Elige tu Mordé favorito y acompáñalo como más te guste.</p>
+      <p class="text-muted">Waffles saludables hechos a base de garbanzo, preparados al momento con ingredientes naturales y mucho amor.</p>
+    </div>
+    <div class="col-lg-6">
+      <img src="https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=900&q=80" alt="Waffle Mordé" class="img-fluid rounded-4 shadow">
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <h2 class="text-center mb-5">Nuestros waffles <span class="divider-heart"></span></h2>
+  <div class="row g-4">
+    {% for product in waffles %}
+      <div class="col-md-4" id="producto-{{ product.slug }}">
+        <div class="product-card">
+          <button type="button" class="wishlist-toggle js-wishlist-toggle" data-product-id="{{ product.id }}" title="Guardar como favorito">♡</button>
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+          {% else %}
+            <img src="https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=500&q=80" alt="{{ product.name }}">
+          {% endif %}
+          <div class="p-3">
+            <h6 class="mb-1">{{ product.name }}</h6>
+            <p class="small text-muted">{{ product.description }}</p>
+            <div class="d-flex align-items-center justify-content-between">
+              <strong>{% if product.price_is_from %}Desde {% endif %}{{ product.price|soles }}</strong>
+              <button type="button" class="btn-morde-light js-add-to-cart" data-product-id="{{ product.id }}">Pedir</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <h3 class="text-center my-5">Extras y toppings <span class="divider-heart"></span></h3>
+  <div class="d-flex flex-wrap justify-content-center gap-3">
+    {% for extra in extras %}
+      <span class="chip-extra">{{ extra.icon_emoji }} {{ extra.name }}</span>
+    {% endfor %}
+  </div>
+  <p class="small text-muted text-center mt-2">* Agrega tus extras favoritos a cualquier Mordé.</p>
+
+  {% if combos %}
+    <h3 class="text-center my-5">Combos recomendados <span class="divider-heart"></span></h3>
+    <div class="row g-4">
+      {% for combo in combos %}
+        <div class="col-md-6">
+          <div class="product-card d-flex align-items-center p-3 gap-3">
+            {% if combo.image %}
+              <img src="{{ combo.image.url }}" alt="{{ combo.name }}" style="width:140px;height:140px;border-radius:10px;">
+            {% else %}
+              <img src="https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300&q=80" alt="{{ combo.name }}" style="width:140px;height:140px;border-radius:10px;object-fit:cover;">
+            {% endif %}
+            <div class="flex-grow-1">
+              <h6 class="mb-1">{{ combo.name }}</h6>
+              <p class="small text-muted mb-2">{{ combo.description }}</p>
+              <div class="d-flex align-items-center justify-content-between">
+                <strong>{{ combo.price|soles }}</strong>
+                <button type="button" class="btn-morde-light js-add-to-cart" data-product-id="{{ combo.id }}">Pedir combo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+{% include 'partials/steps_band.html' with steps=menu_steps %}
+
+{% url 'orders:checkout' as checkout_url %}
+{% include 'partials/cta_banner.html' with heading='¿Listo para tu Mordé?' subheading='Pide ahora y disfruta de waffles saludables hechos para ti.' cta_left_label='Consultar por WhatsApp' cta_right_label='Continuar pedido' cta_right_url=checkout_url %}
+
+<div class="modal fade" id="addToCartModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Personaliza tu pedido</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <label class="form-label mb-0">Cantidad</label>
+          <div class="qty-stepper">
+            <button type="button" class="qty-btn" id="modal-qty-decrease">−</button>
+            <span class="qty-value" id="modal-qty-value">1</span>
+            <button type="button" class="qty-btn" id="modal-qty-increase">+</button>
+          </div>
+        </div>
+        {% if extras %}
+          <label class="form-label">Extras / Toppings (opcional)</label>
+          {% for extra in extras %}
+            <div class="extra-row js-extra-row" data-extra-id="{{ extra.id }}">
+              <div>{{ extra.icon_emoji }} {{ extra.name }} <span class="text-muted small">(+{{ extra.price|soles }} c/u)</span></div>
+              <div class="qty-stepper">
+                <button type="button" class="qty-btn js-extra-qty-decrease">−</button>
+                <span class="qty-value js-extra-qty-value">0</span>
+                <button type="button" class="qty-btn js-extra-qty-increase">+</button>
+              </div>
+            </div>
+          {% endfor %}
+        {% endif %}
+        <label class="form-label mt-2">Notas (opcional)</label>
+        <textarea class="form-control" id="modal-notes" rows="2" placeholder="Ej. Sin azúcar añadida, más miel, etc."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-morde-amber" id="modal-confirm-add">Agregar al carrito</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/cart.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endblock %}

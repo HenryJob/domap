@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load morde_extras %}
+{% block title %}Pedido confirmado · Mordé{% endblock %}
+
+{% block content %}
+<section class="container py-5 text-center">
+  <div class="icon-badge mx-auto mb-3" style="width:90px;height:90px;font-size:2.2rem;">💛</div>
+  <h1>¡Gracias por tu pedido, {{ order.customer_name }}!</h1>
+  <p class="text-muted">Tu pedido #{{ order.id }} fue confirmado. Te contactaremos al {{ order.phone }} para coordinar la entrega.</p>
+
+  <div class="product-card p-4 mx-auto mt-4 text-start" style="max-width:480px;">
+    {% for item in order.items.all %}
+      <div class="mb-2">
+        <div class="d-flex justify-content-between">
+          <span>{{ item.quantity }} x {{ item.product.name }}</span>
+          <span>{{ item.line_total|soles }}</span>
+        </div>
+        {% for extra in item.extras.all %}
+          <div class="small text-muted">+ {{ extra.quantity }}x {{ extra.extra.name }} ({{ extra.unit_price|soles }} c/u)</div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <hr>
+    <div class="d-flex justify-content-between"><span>Subtotal</span><span>{{ order.subtotal|soles }}</span></div>
+    <div class="d-flex justify-content-between mb-2"><span>Delivery</span><span>{{ order.delivery_fee|soles }}</span></div>
+    <div class="d-flex justify-content-between fw-bold fs-5"><span>Total</span><span>{{ order.total|soles }}</span></div>
+  </div>
+
+  <a href="{% url 'core:home' %}" class="btn-morde-dark mt-4">Volver al inicio</a>
+</section>
+{% endblock %}

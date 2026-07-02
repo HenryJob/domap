@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Registrar venta WhatsApp · Staff Mordé{% endblock %}
+
+{% block content %}
+<section class="container py-5" style="max-width:760px;">
+  <h2 class="mb-4">Registrar venta de WhatsApp</h2>
+  <p class="text-muted">Usa esto para registrar un pedido cerrado por WhatsApp, para que cuente en la conversión y en los ingresos del panel de analítica.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Nombre del cliente</label>
+        {{ form.customer_name|add_class:"form-control" }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Teléfono</label>
+        {{ form.phone|add_class:"form-control" }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Fecha/hora de la venta</label>
+        {{ form.sale_date|add_class:"form-control" }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Monto total (S/)</label>
+        {{ form.total_amount|add_class:"form-control" }}
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Código de sesión (opcional)</label>
+        {{ form.session_reference|add_class:"form-control" }}
+        <div class="form-text">Cópialo del mensaje de WhatsApp del cliente, si lo compartió.</div>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Notas</label>
+        {{ form.notes|add_class:"form-control" }}
+      </div>
+    </div>
+
+    <h5 class="mt-4">Productos vendidos (opcional)</h5>
+    {{ formset.management_form }}
+    <div class="table-responsive">
+      <table class="table">
+        <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio unitario</th><th></th></tr></thead>
+        <tbody>
+          {% for item_form in formset %}
+            <tr>
+              <td>{{ item_form.product|add_class:"form-select form-select-sm" }}</td>
+              <td>{{ item_form.quantity|add_class:"form-control form-control-sm" }}</td>
+              <td>{{ item_form.unit_price|add_class:"form-control form-control-sm" }}</td>
+              <td>{% if item_form.instance.pk %}{{ item_form.DELETE }}{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <button type="submit" class="btn-morde-amber">Guardar venta</button>
+    <a href="{% url 'orders:manual_sale_list' %}" class="btn-morde-light">Cancelar</a>
+  </form>
+</section>
+{% endblock %}

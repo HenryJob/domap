@@ -1,0 +1,120 @@
+{% load static morde_extras %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de analítica · Mordé</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'css/morde.css' %}?v={{ STATIC_VERSION }}" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body style="background:#f3efe8;">
+  <header class="morde-header py-3 mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+      <span class="morde-logo">Mordé · Panel de analítica</span>
+      <div class="d-flex gap-2">
+        <a href="{% url 'orders:manual_sale_list' %}" class="btn-morde-light bg-white btn-sm">Ventas WhatsApp</a>
+        <a href="{% url 'core:home' %}" class="btn-morde-light bg-white btn-sm">Volver al sitio</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container pb-5">
+    <form method="get" class="d-flex gap-2 align-items-end mb-4">
+      <div>
+        <label class="form-label small mb-0">Desde</label>
+        <input type="date" name="start" value="{{ start|date:'Y-m-d' }}" class="form-control form-control-sm">
+      </div>
+      <div>
+        <label class="form-label small mb-0">Hasta</label>
+        <input type="date" name="end" value="{{ end|date:'Y-m-d' }}" class="form-control form-control-sm">
+      </div>
+      <button type="submit" class="btn-morde-amber btn-sm">Filtrar</button>
+    </form>
+
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="product-card p-3 text-center">
+          <div class="small text-muted">Visitas (no-bot)</div>
+          <div class="fs-3 fw-bold">{{ visits }}</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="product-card p-3 text-center">
+          <div class="small text-muted">Tiempo promedio / mediana</div>
+          <div class="fs-5 fw-bold">{{ avg_duration }}s / {{ median_duration }}s</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="product-card p-3 text-center">
+          <div class="small text-muted">Carrito abandonado</div>
+          <div class="fs-3 fw-bold">{{ abandonment_rate }}%</div>
+          <div class="small text-muted">{{ abandoned_count }} de {{ abandonment_candidates }} (&gt;{{ abandonment_window_minutes }} min)</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="product-card p-3 text-center">
+          <div class="small text-muted">Conversión (web + WhatsApp)</div>
+          <div class="fs-3 fw-bold">{{ conversion_rate }}%</div>
+          <div class="small text-muted">{{ combined_sales_count }} ventas · {{ combined_revenue|soles }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <div class="product-card p-3">
+          <h6>Visitas en el tiempo</h6>
+          <canvas id="chart-visits" height="200"></canvas>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="product-card p-3">
+          <h6>Carrito vs. favoritos ("almacenaron")</h6>
+          <canvas id="chart-cart-wishlist" height="200"></canvas>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="product-card p-3">
+          <h6>Embudo de conversión (flujo web)</h6>
+          <canvas id="chart-funnel" height="200"></canvas>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="product-card p-3">
+          <h6>Ventas en el tiempo (web + WhatsApp)</h6>
+          <canvas id="chart-sales" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card p-3">
+      <h6>Productos: vistas / agregados al carrito / vendidos</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Producto</th><th>Vistas</th><th>Agregados al carrito</th><th>Vendidos</th></tr></thead>
+        <tbody>
+          {% for p in top_products %}
+            <tr><td>{{ p.name }}</td><td>{{ p.views }}</td><td>{{ p.cart_adds }}</td><td>{{ p.sales }}</td></tr>
+          {% empty %}
+            <tr><td colspan="4" class="text-muted text-center">Sin datos en este rango.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {{ visit_dates|json_script:"data-visit-dates" }}
+  {{ visit_counts|json_script:"data-visit-counts" }}
+  {{ cart_add_total|json_script:"data-cart-add-total" }}
+  {{ wishlist_add_total|json_script:"data-wishlist-add-total" }}
+  {{ funnel_labels|json_script:"data-funnel-labels" }}
+  {{ funnel_values|json_script:"data-funnel-values" }}
+  {{ sales_dates|json_script:"data-sales-dates" }}
+  {{ web_sales_series|json_script:"data-web-sales" }}
+  {{ whatsapp_sales_series|json_script:"data-whatsapp-sales" }}
+  {{ combined_sales_series|json_script:"data-combined-sales" }}
+
+  <script src="{% static 'js/dashboard-charts.js' %}?v={{ STATIC_VERSION }}"></script>
+</body>
+</html>

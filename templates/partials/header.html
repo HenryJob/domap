@@ -1,0 +1,19 @@
+{% load static %}
+<header class="morde-header">
+  <div class="container d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <a href="{% url 'core:home' %}" class="d-flex align-items-center gap-2 text-decoration-none">
+      <span class="morde-logo">Mordé</span>
+    </a>
+    <nav class="d-none d-lg-flex gap-4">
+      <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">Inicio</a>
+      <a class="nav-link" href="{% url 'core:home' %}#nosotros">Nosotros</a>
+      <a class="nav-link {% if request.resolver_match.url_name == 'menu' %}active{% endif %}" href="{% url 'catalog:menu' %}">Menú</a>
+      <a class="nav-link" href="{% url 'core:home' %}#beneficios">Beneficios</a>
+      <a class="nav-link {% if request.resolver_match.app_name == 'orders' %}active{% endif %}" href="{% url 'orders:checkout' %}">Pedidos</a>
+    </nav>
+    <a href="{% url 'orders:checkout' %}#comprar" class="morde-cart-icon" title="Carrito">
+      🛍️
+      {% if cart_count > 0 %}<span class="morde-badge">{{ cart_count }}</span>{% endif %}
+    </a>
+  </div>
+</header>
