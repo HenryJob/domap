@@ -16,6 +16,17 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# Detrás de Nginx/Cloudflare, Gunicorn solo ve tráfico HTTP plano del proxy
+# interno; este header le dice a Django que la conexión original del cliente
+# sí fue HTTPS (si no, request.is_secure() da False y el CSRF de origen falla).
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Django 4+ exige que el Origin de las peticiones POST coincida con uno de
+# estos orígenes confiables (con esquema incluido), o el CSRF falla con 403.
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()
+] or [f'https://{host}' for host in ALLOWED_HOSTS if host not in ('localhost', '127.0.0.1')]
+
 
 # Application definition
 
