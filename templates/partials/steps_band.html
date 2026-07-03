@@ -1,7 +1,7 @@
 {# Parámetro esperado: steps = lista de {title, description} #}
 <section class="steps-band">
   <div class="container">
-    <h2 class="text-center mb-5">Así funciona <span class="divider-heart"></span></h2>
+    <h2 class="text-center mb-5">Así funciona <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
     <div class="row g-4">
       {% for step in steps %}
         <div class="col-6 col-md-{% widthratio 12 steps|length 1 %} text-center">

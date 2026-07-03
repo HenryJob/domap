@@ -1,3 +1,5 @@
+import secrets
+
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -22,8 +24,20 @@ class Order(models.Model):
     # correlacionar el pedido con su sesión de analítica sin acoplar las apps.
     session_key = models.CharField(max_length=40, blank=True, db_index=True)
 
+    # Nullable: permite que el pedido siga siendo válido como invitado si no
+    # hay sesión iniciada, o si la cuenta del usuario se elimina después.
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True,
+        on_delete=models.SET_NULL, related_name='orders',
+    )
+    # Token único que autoriza ver la confirmación del pedido sin estar
+    # logueado (link de seguimiento por email / lookup de invitado), y evita
+    # que cualquiera pueda ver un pedido ajeno adivinando el id en la URL.
+    access_token = models.CharField(max_length=40, unique=True, editable=False, blank=True)
+
     customer_name = models.CharField(max_length=120)
     phone = models.CharField(max_length=20)
+    email = models.CharField(max_length=254, blank=True)
     order_type = models.CharField(max_length=10, choices=ORDER_TYPE_CHOICES, default='delivery')
     address = models.CharField(max_length=255, blank=True)
     scheduled_date = models.DateField(null=True, blank=True)
@@ -40,6 +54,11 @@ class Order(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        if not self.access_token:
+            self.access_token = secrets.token_urlsafe(24)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Pedido #{self.id} · {self.customer_name}'

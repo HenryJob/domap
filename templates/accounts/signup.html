@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Crear cuenta · Mordé{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="product-card p-4">
+        <h2 class="text-center mb-4">Crear cuenta</h2>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            {{ form.first_name|add_class:"form-control" }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Usuario</label>
+            {{ form.username|add_class:"form-control" }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Correo electrónico</label>
+            {{ form.email|add_class:"form-control" }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            {{ form.password1|add_class:"form-control" }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirma tu contraseña</label>
+            {{ form.password2|add_class:"form-control" }}
+          </div>
+          {% for field in form %}
+            {% if field.errors %}<div class="alert alert-danger">{{ field.errors }}</div>{% endif %}
+          {% endfor %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+          <button type="submit" class="btn-morde-amber w-100 justify-content-center">Crear cuenta</button>
+        </form>
+        <p class="small text-muted text-center mt-3 mb-0">
+          ¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}">Inicia sesión</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

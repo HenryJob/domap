@@ -10,10 +10,11 @@
         <h6>Navegación</h6>
         <ul class="list-unstyled small">
           <li><a href="{% url 'core:home' %}">Inicio</a></li>
-          <li><a href="{% url 'core:home' %}#nosotros">Nosotros</a></li>
+          <li><a href="{% url 'core:nosotros' %}">Nosotros</a></li>
           <li><a href="{% url 'catalog:menu' %}">Menú</a></li>
-          <li><a href="{% url 'core:home' %}#beneficios">Beneficios</a></li>
+          <li><a href="{% url 'core:beneficios' %}">Beneficios</a></li>
           <li><a href="{% url 'orders:checkout' %}">Pedidos</a></li>
+          <li><a href="{% url 'orders:order_lookup' %}">Rastrear pedido</a></li>
         </ul>
       </div>
       <div class="col-md-3">

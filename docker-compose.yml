@@ -1,0 +1,14 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./db.sqlite3:/app/db.sqlite3
+      - media_data:/app/media
+    env_file:
+      - .env
+    restart: unless-stopped
+
+volumes:
+  media_data:

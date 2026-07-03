@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load morde_extras %}
+{% block title %}Nosotros · Mordé{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-5">
+      <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=700&q=80"
+           class="img-fluid rounded-4 shadow" alt="Equipo Mordé">
+    </div>
+    <div class="col-lg-7">
+      <h1 class="display-6 fw-bold">Nosotros <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h1>
+      <p class="lead" style="color: var(--color-amber-dark);">Nacimos por un antojo: comer algo dulce y rico, sin sentirnos mal después.</p>
+      <p class="text-muted">Mordé es una marca peruana de waffles hechos a base de garbanzo. Empezamos como un proyecto pequeño, entre amigos que querían ofrecer una alternativa distinta al postre de siempre: algo que supiera igual de rico, pero que le hiciera bien a quien lo come.</p>
+      <p class="text-muted">Hoy seguimos preparando cada waffle al momento, pedido por pedido, desde nuestro punto en Miraflores, Lima — cuidando cada detalle desde la receta hasta la entrega.</p>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <h2 class="text-center mb-5">Nuestra misión <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
+  <div class="row g-4 text-center">
+    <div class="col-md-4">
+      <div class="icon-badge mx-auto"><i class="bi bi-bullseye"></i></div>
+      <h6>Nuestro propósito</h6>
+      <p class="small text-muted">Ofrecer un antojo dulce que sea también una mejor elección para el día a día.</p>
+    </div>
+    <div class="col-md-4">
+      <div class="icon-badge mx-auto"><i class="bi bi-eye"></i></div>
+      <h6>Nuestra visión</h6>
+      <p class="small text-muted">Ser la marca de referencia en waffles saludables y hechos al momento en Lima.</p>
+    </div>
+    <div class="col-md-4">
+      <div class="icon-badge mx-auto"><i class="bi bi-heart"></i></div>
+      <h6>Lo que nos mueve</h6>
+      <p class="small text-muted">Creer que se puede comer rico y comer bien, sin tener que elegir entre las dos cosas.</p>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <h2 class="text-center mb-5">Nuestros valores <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
+  <div class="row g-4 text-center">
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-egg-fried"></i></div>
+      <h6>Frescura</h6>
+      <p class="small text-muted">Cocinamos tu waffle recién hecho el pedido, nunca antes.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-scooter"></i></div>
+      <h6>Compromiso</h6>
+      <p class="small text-muted">Llegamos a tiempo o te esperamos listo para recoger.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-chat-heart"></i></div>
+      <h6>Cercanía</h6>
+      <p class="small text-muted">Te asesoramos y atendemos con amabilidad siempre.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-award"></i></div>
+      <h6>Calidad</h6>
+      <p class="small text-muted">Elegimos con cuidado cada proveedor e ingrediente que usamos.</p>
+    </div>
+  </div>
+  <div class="text-center mt-4">
+    <a href="{% url 'core:beneficios' %}" class="btn-morde-light">¿Qué le aporta el garbanzo a tu waffle?</a>
+  </div>
+</section>
+
+{% url 'orders:checkout' as checkout_url %}
+{% include 'partials/cta_banner.html' with heading='¿Listo para probar Mordé?' subheading='Descubre nuestros waffles hechos a base de garbanzo.' cta_left_label='Pedir por WhatsApp' cta_right_label='Ver menú' cta_right_url=checkout_url %}
+{% endblock %}

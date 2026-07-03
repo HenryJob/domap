@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Rastrear pedido · Mordé{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="product-card p-4">
+        <h2 class="text-center mb-4">Rastrear mi pedido</h2>
+        <p class="small text-muted text-center">Ingresa el número de pedido y el teléfono que usaste al comprar.</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Número de pedido</label>
+            {{ form.order_number|add_class:"form-control" }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Teléfono</label>
+            {{ form.phone|add_class:"form-control" }}
+          </div>
+          <button type="submit" class="btn-morde-amber w-100 justify-content-center">Buscar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

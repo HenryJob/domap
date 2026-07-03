@@ -330,6 +330,14 @@ a {
   padding: 3rem 0 1.5rem;
 }
 
+.divider-heart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  margin-top: 0.5rem;
+}
+
 .divider-heart::before,
 .divider-heart::after {
   content: '';
@@ -338,5 +346,17 @@ a {
   height: 1px;
   background: var(--color-amber);
   vertical-align: middle;
-  margin: 0 0.5rem;
+}
+
+.divider-heart::before {
+  margin-right: 0.5rem;
+}
+
+.divider-heart::after {
+  margin-left: 0.5rem;
+}
+
+.divider-heart i {
+  color: var(--color-amber-dark);
+  font-size: 0.9rem;
 }

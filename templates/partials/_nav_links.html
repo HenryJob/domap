@@ -1,0 +1,4 @@
+<a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">Inicio</a>
+<a class="nav-link {% if request.resolver_match.url_name == 'nosotros' %}active{% endif %}" href="{% url 'core:nosotros' %}">Nosotros</a>
+<a class="nav-link {% if request.resolver_match.url_name == 'menu' %}active{% endif %}" href="{% url 'catalog:menu' %}">Menú</a>
+<a class="nav-link {% if request.resolver_match.url_name == 'beneficios' %}active{% endif %}" href="{% url 'core:beneficios' %}">Beneficios</a>

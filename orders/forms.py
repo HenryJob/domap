@@ -7,12 +7,13 @@ class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = [
-            'customer_name', 'phone', 'order_type', 'address',
+            'customer_name', 'phone', 'email', 'order_type', 'address',
             'scheduled_date', 'scheduled_time', 'payment_method', 'notes',
         ]
         widgets = {
             'customer_name': forms.TextInput(attrs={'placeholder': 'Ingresa tu nombre'}),
             'phone': forms.TextInput(attrs={'placeholder': 'Ej. 987 654 321'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'Ej. tucorreo@ejemplo.com (opcional)'}),
             'order_type': forms.RadioSelect(attrs={'class': 'btn-check'}),
             'address': forms.TextInput(attrs={'placeholder': 'Ej. Av. La Marina 1234, San Miguel'}),
             'scheduled_date': forms.DateInput(attrs={'type': 'date'}),
@@ -26,6 +27,11 @@ class OrderForm(forms.ModelForm):
         if cleaned.get('order_type') == 'delivery' and not cleaned.get('address'):
             self.add_error('address', 'La dirección es obligatoria para delivery.')
         return cleaned
+
+
+class OrderLookupForm(forms.Form):
+    order_number = forms.IntegerField(label='Número de pedido', min_value=1)
+    phone = forms.CharField(label='Teléfono', max_length=20)
 
 
 class ManualSaleForm(forms.ModelForm):

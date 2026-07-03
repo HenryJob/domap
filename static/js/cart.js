@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (event.target.closest('.js-line-remove')) {
       morePostJson(`/carrito/eliminar/${lineId}/`, {}).then((data) => {
         updateCartBadge(data.cart_count);
-        if (data.cart_count === 0) { location.reload(); } else { refreshSummary(); }
+        refreshSummary();
       });
     } else if (event.target.closest('.js-line-qty-increase')) {
       const next = parseInt(qtyValueLineEl.textContent, 10) + 1;
@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const next = parseInt(qtyValueLineEl.textContent, 10) - 1;
       morePostJson(`/carrito/actualizar/${lineId}/`, { quantity: next }).then((data) => {
         updateCartBadge(data.cart_count);
-        if (data.cart_count === 0) { location.reload(); } else { refreshSummary(); }
+        refreshSummary();
       });
     }
   });

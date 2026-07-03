@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load morde_extras %}
+{% block title %}Beneficios · Mordé{% endblock %}
+
+{% block content %}
+
+<section class="container py-5">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-5">
+      <img src="https://images.unsplash.com/photo-1515543904379-3d757afe72e4?w=700&q=80"
+           class="img-fluid rounded-4 shadow" alt="Garbanzo, ingrediente base de Mordé"
+           style="width: 100%; height: 320px; object-fit: cover;">
+    </div>
+    <div class="col-lg-7">
+      <h2>El poder del garbanzo <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
+      <p class="text-muted">El garbanzo es una legumbre que usamos como base de nuestra masa en lugar de la harina tradicional. Es una fuente natural de proteína vegetal y fibra, aporta hierro y otros minerales, y tiene un índice glucémico más bajo que la harina refinada, por lo que ayuda a sentirte satisfecho por más tiempo.</p>
+      <p class="text-muted">Por eso un waffle Mordé no es solo un antojo dulce: es una opción con mejor perfil nutricional, sin perder el sabor y la textura dorada que tanto te gustan.</p>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <h2 class="text-center mb-5">Beneficios de nuestros waffles <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
+  <div class="row g-4 text-center">
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-circle-half"></i></div>
+      <h6>Proteína vegetal</h6>
+      <p class="small text-muted">Hecho a base de garbanzo, fuente natural de proteína.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-flower1"></i></div>
+      <h6>Fibra y saciedad</h6>
+      <p class="small text-muted">Aporta fibra que ayuda a sentirte bien por más tiempo.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-egg-fried"></i></div>
+      <h6>Práctico y rápido</h6>
+      <p class="small text-muted">Pide desde donde estés. Delivery y recojo coordinado.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-heart"></i></div>
+      <h6>Antojo sin culpa</h6>
+      <p class="small text-muted">Disfruta algo dulce con mejor perfil nutricional.</p>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <h2 class="text-center mb-5">Ideal para cualquier momento <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
+  <div class="row g-4 text-center">
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-sunrise"></i></div>
+      <h6>Desayuno</h6>
+      <p class="small text-muted">Empieza el día con energía y proteína.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-cup-hot"></i></div>
+      <h6>Media tarde</h6>
+      <p class="small text-muted">El antojo dulce que sí te hace bien.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-people"></i></div>
+      <h6>Compartir</h6>
+      <p class="small text-muted">Perfecto para compartir en familia o con amigos.</p>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="icon-badge"><i class="bi bi-gift"></i></div>
+      <h6>Consentirte</h6>
+      <p class="small text-muted">Date un gusto rico sin remordimientos.</p>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4 text-center">
+  <h1 class="display-6 fw-bold">Rico, nutritivo y práctico <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h1>
+  <p class="lead text-muted mt-3">Todo lo que el garbanzo le da a tu waffle, y a ti.</p>
+  <div class="d-flex gap-3 flex-wrap justify-content-center mt-4">
+    <a href="{% url 'catalog:menu' %}" class="btn-morde-dark">Ver menú</a>
+    <a href="{% url 'core:nosotros' %}" class="btn-morde-light">Conócenos</a>
+  </div>
+</section>
+
+{% url 'orders:checkout' as checkout_url %}
+{% include 'partials/cta_banner.html' with heading='¿Lista/o para tu Mordé?' subheading='Elige cómo pedir y disfruta de waffles saludables, hechos con amor.' cta_left_label='Pedir por WhatsApp' cta_right_label='Comprar en la web' cta_right_url=checkout_url %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Mi cuenta · Mordé{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+  <h2 class="mb-4">Mi cuenta</h2>
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="product-card p-4">
+        <h5>Hola, {{ request.user.first_name|default:request.user.username }}</h5>
+        <p class="text-muted small">{{ request.user.email }}</p>
+        <a href="{% url 'accounts:order_history' %}" class="btn-morde-light">Ver mis pedidos</a>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="product-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Mis direcciones</h5>
+          <a href="{% url 'accounts:address_add' %}" class="btn-morde-light">+ Nueva</a>
+        </div>
+        {% for address in addresses %}
+          <div class="d-flex justify-content-between align-items-start border-bottom py-2">
+            <div>
+              <strong>{{ address.label }}</strong>{% if address.is_default %} <span class="badge bg-warning text-dark">Predeterminada</span>{% endif %}
+              <div class="small text-muted">{{ address.address }}</div>
+            </div>
+            <div class="d-flex gap-2">
+              <a href="{% url 'accounts:address_edit' address.id %}" class="small">Editar</a>
+              <a href="{% url 'accounts:address_delete' address.id %}" class="small text-danger">Eliminar</a>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-muted small">Aún no tienes direcciones guardadas.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

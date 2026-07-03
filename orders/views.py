@@ -1,39 +1,13 @@
-from decimal import Decimal
-
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 
 from cart.cart import Cart
-from .forms import OrderForm, ManualSaleForm, ManualSaleItemFormSet
-from .models import Order, OrderItem, OrderItemExtra, ManualSale
-
-PEDIDOS_STEPS = [
-    {'icon': '🎁', 'title': 'Elige tu producto', 'description': 'Escoge tu Mordé favorito desde el menú.'},
-    {'icon': '🛵', 'title': 'Define tu forma de pedido', 'description': 'Selecciona delivery o recojo, fecha y hora.'},
-    {'icon': '📋', 'title': 'Confirmamos tu orden', 'description': 'Revisamos los detalles y preparamos tu waffle al momento.'},
-    {'icon': '💛', 'title': 'Recibe y disfruta', 'description': 'Te lo entregamos o lo recoges y disfrutas fresco y delicioso.'},
-]
-
-
-def _log_checkout_started(request):
-    try:
-        from analytics.services import log_checkout_started
-        log_checkout_started(request)
-    except ImportError:
-        pass
-
-
-def _cart_summary_context(cart):
-    delivery_fee = Decimal(str(settings.DELIVERY_FEE))
-    cart_subtotal = cart.subtotal()
-    return {
-        'cart_lines': cart.lines(),
-        'cart_subtotal': cart_subtotal,
-        'delivery_fee': delivery_fee,
-        'cart_total': cart_subtotal + delivery_fee,
-    }
+from cart.services import summary_context
+from .forms import OrderLookupForm, ManualSaleForm, ManualSaleItemFormSet
+from .models import Order, ManualSale
 
 
 def cart_summary_partial(request):
@@ -41,56 +15,41 @@ def cart_summary_partial(request):
     sin recargar la página (y así no perder lo que el cliente ya escribió en
     el formulario de Completa tu pedido)."""
     cart = Cart(request)
-    return render(request, 'orders/_summary_partial.html', _cart_summary_context(cart))
+    return render(request, 'orders/_summary_partial.html', summary_context(cart))
 
 
 def checkout(request):
-    cart = Cart(request)
-
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if cart.is_empty():
-            messages.error(request, 'Tu carrito está vacío. Agrega un producto antes de continuar.')
-            return redirect('catalog:menu')
-
-        if form.is_valid():
-            lines = cart.lines()
-            subtotal = cart.subtotal()
-            delivery_fee = Decimal(str(settings.DELIVERY_FEE)) if form.cleaned_data['order_type'] == 'delivery' else Decimal('0')
-
-            order = form.save(commit=False)
-            order.session_key = request.session.session_key or ''
-            order.subtotal = subtotal
-            order.delivery_fee = delivery_fee
-            order.total = subtotal + delivery_fee
-            order.status = 'confirmed'
-            order.save()
-
-            for line in lines:
-                item = OrderItem.objects.create(
-                    order=order, product=line['product'],
-                    quantity=line['quantity'], unit_price=line['product'].price,
-                )
-                for extra, extra_qty in line['extras']:
-                    OrderItemExtra.objects.create(
-                        order_item=item, extra=extra, quantity=extra_qty, unit_price=extra.price)
-
-            cart.clear()
-            request.session.pop('checkout_started_logged', None)
-            return redirect('orders:order_success', order_id=order.id)
-    else:
-        if not cart.is_empty():
-            _log_checkout_started(request)
-        initial = {'order_type': 'delivery', 'payment_method': 'efectivo'}
-        form = OrderForm(initial=initial)
-
-    context = {'form': form, 'pedidos_steps': PEDIDOS_STEPS, **_cart_summary_context(cart)}
-    return render(request, 'orders/checkout.html', context)
+    """El carrito (cart:cart_detail) ya gestiona todo el pedido en una sola
+    página; esta ruta se conserva solo por compatibilidad con enlaces
+    existentes (footer, favoritos guardados, etc.)."""
+    return redirect('cart:cart_detail')
 
 
 def order_success(request, order_id):
     order = get_object_or_404(Order, id=order_id)
+    token = request.GET.get('t', '')
+    owns_via_user = request.user.is_authenticated and order.user_id == request.user.id
+    owns_via_token = bool(token) and token == order.access_token
+    if not (owns_via_user or owns_via_token):
+        raise Http404()
     return render(request, 'orders/order_success.html', {'order': order})
+
+
+def order_lookup(request):
+    if request.method == 'POST':
+        form = OrderLookupForm(request.POST)
+        if form.is_valid():
+            order = Order.objects.filter(
+                id=form.cleaned_data['order_number'],
+                phone=form.cleaned_data['phone'],
+            ).first()
+            if order:
+                success_url = reverse('orders:order_success', args=[order.id]) + f'?t={order.access_token}'
+                return redirect(success_url)
+            messages.error(request, 'No encontramos un pedido con esos datos.')
+    else:
+        form = OrderLookupForm()
+    return render(request, 'orders/order_lookup.html', {'form': form})
 
 
 @staff_member_required

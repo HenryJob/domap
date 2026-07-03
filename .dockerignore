@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+.claude/
+db.sqlite3
+staticfiles/
+media/
+notas-proyecto.md
+design_reference/

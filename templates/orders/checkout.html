@@ -17,11 +17,11 @@
 </section>
 
 <section class="container py-4">
-  <h2 class="text-center mb-5">¿Cómo quieres pedir? <span class="divider-heart"></span></h2>
+  <h2 class="text-center mb-5">¿Cómo quieres pedir? <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
   <div class="row g-4 justify-content-center">
     <div class="col-md-5">
       <div class="product-card p-4 text-center h-100">
-        <div class="icon-badge mx-auto" style="font-size:1.8rem;">💬</div>
+        <div class="icon-badge mx-auto" style="font-size:1.8rem;"><i class="bi bi-whatsapp"></i></div>
         <h5>Pedir por WhatsApp</h5>
         <p class="small text-muted">Escríbenos directamente, confirma detalles, consulta disponibilidad y coordina tu pedido de forma rápida y personalizada.</p>
         <a href="{% whatsapp_order_link %}" target="_blank" rel="noopener" class="btn-morde-dark js-whatsapp-cta">Pedir por WhatsApp</a>
@@ -29,7 +29,7 @@
     </div>
     <div class="col-md-5">
       <div class="product-card p-4 text-center h-100">
-        <div class="icon-badge mx-auto" style="font-size:1.8rem;">🛒</div>
+        <div class="icon-badge mx-auto" style="font-size:1.8rem;"><i class="bi bi-cart3"></i></div>
         <h5>Comprar en la web</h5>
         <p class="small text-muted">Agrega tus productos al carrito, completa tus datos y realiza tu pedido directamente en nuestro sitio web.</p>
         <a href="#comprar" class="btn-morde-light">Comprar en la web</a>
@@ -39,7 +39,7 @@
 </section>
 
 <section class="container py-5" id="comprar">
-  <h2 class="text-center mb-5">Completa tu pedido <span class="divider-heart"></span></h2>
+  <h2 class="text-center mb-5">Completa tu pedido <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
 
   {% if cart_lines %}
   <div class="row g-4">
@@ -54,6 +54,10 @@
           <div class="col-md-6">
             <label class="form-label">Teléfono</label>
             {{ form.phone|add_class:"form-control" }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email (opcional, para tu confirmación)</label>
+            {{ form.email|add_class:"form-control" }}
           </div>
           <div class="col-12">
             <label class="form-label d-block">Tipo de pedido</label>
@@ -93,7 +97,7 @@
         {% if form.non_field_errors %}
           <div class="alert alert-danger mt-3">{{ form.non_field_errors }}</div>
         {% endif %}
-        <button type="submit" class="btn-morde-amber mt-4 w-100 justify-content-center">🔒 Confirmar pedido</button>
+        <button type="submit" class="btn-morde-amber mt-4 w-100 justify-content-center"><i class="bi bi-lock-fill"></i> Confirmar pedido</button>
         <p class="small text-muted text-center mt-2 mb-0">Tus datos están protegidos</p>
       </form>
     </div>
@@ -116,22 +120,22 @@
 <section class="container py-5">
   <div class="row g-4 text-center">
     <div class="col-6 col-md-3">
-      <div class="icon-badge">🍽️</div>
+      <div class="icon-badge"><i class="bi bi-egg-fried"></i></div>
       <h6>Preparado al momento</h6>
       <p class="small text-muted">Waffles hechos al instante para máxima frescura.</p>
     </div>
     <div class="col-6 col-md-3">
-      <div class="icon-badge">🛵</div>
+      <div class="icon-badge"><i class="bi bi-scooter"></i></div>
       <h6>Delivery y recojo coordinado</h6>
       <p class="small text-muted">Llegamos a tiempo o te esperamos listo para recoger.</p>
     </div>
     <div class="col-6 col-md-3">
-      <div class="icon-badge">💛</div>
+      <div class="icon-badge"><i class="bi bi-heart"></i></div>
       <h6>Atención cercana</h6>
       <p class="small text-muted">Te asesoramos y atendemos con amabilidad siempre.</p>
     </div>
     <div class="col-6 col-md-3">
-      <div class="icon-badge">🌿</div>
+      <div class="icon-badge"><i class="bi bi-leaf"></i></div>
       <h6>Ingredientes seleccionados</h6>
       <p class="small text-muted">Usamos ingredientes naturales, saludables y de calidad.</p>
     </div>

@@ -1,9 +1,56 @@
 import json
+from django.contrib import messages
 from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 from catalog.models import Product
+from orders.forms import OrderForm
+from orders.models import Order
+from orders.services import place_order
 from .cart import Cart
+from .services import summary_context
 from .wishlist import Wishlist
+
+
+def _log_checkout_started(request):
+    try:
+        from analytics.services import log_checkout_started
+        log_checkout_started(request)
+    except ImportError:
+        pass
+
+
+def cart_detail(request):
+    cart = Cart(request)
+
+    order_id = request.GET.get('order')
+    token = request.GET.get('t')
+    if order_id and token:
+        order = get_object_or_404(Order, id=order_id, access_token=token)
+        return render(request, 'cart/cart_detail.html', {'order': order})
+
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        if cart.is_empty():
+            messages.error(request, 'Tu carrito está vacío. Agrega un producto antes de continuar.')
+            return redirect('catalog:menu')
+
+        if form.is_valid():
+            order = place_order(request, form, cart)
+            success_url = reverse('cart:cart_detail') + f'?order={order.id}&t={order.access_token}'
+            return redirect(success_url)
+    else:
+        if not cart.is_empty():
+            _log_checkout_started(request)
+        initial = {'order_type': 'delivery', 'payment_method': 'efectivo'}
+        if request.user.is_authenticated:
+            initial['customer_name'] = request.user.first_name or request.user.username
+            initial['email'] = request.user.email
+        form = OrderForm(initial=initial)
+
+    context = {'form': form, **summary_context(cart)}
+    return render(request, 'cart/cart_detail.html', context)
 
 
 def _log_cart_event(request, product_id, event_type, quantity=1):

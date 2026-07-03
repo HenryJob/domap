@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static widget_tweaks morde_extras %}
+{% block title %}Mi carrito · Mordé{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+  <h2 class="text-center mb-5">Mi carrito <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
+
+  {% if order %}
+  <div class="row justify-content-center">
+    <div class="col-lg-6 text-center">
+      <div class="icon-badge mx-auto mb-3" style="width:90px;height:90px;font-size:2.2rem;"><i class="bi bi-check-circle"></i></div>
+      <h3>¡Gracias por tu pedido, {{ order.customer_name }}!</h3>
+      <p class="text-muted">Tu pedido #{{ order.id }} fue confirmado. Te contactaremos al {{ order.phone }} para coordinar la entrega.</p>
+
+      <div class="product-card p-4 mt-4 text-start">
+        {% for item in order.items.all %}
+          <div class="mb-2">
+            <div class="d-flex justify-content-between">
+              <span>{{ item.quantity }} x {{ item.product.name }}</span>
+              <span>{{ item.line_total|soles }}</span>
+            </div>
+            {% for extra in item.extras.all %}
+              <div class="small text-muted">+ {{ extra.quantity }}x {{ extra.extra.name }} ({{ extra.unit_price|soles }} c/u)</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+        <hr>
+        <div class="d-flex justify-content-between"><span>Subtotal</span><span>{{ order.subtotal|soles }}</span></div>
+        <div class="d-flex justify-content-between mb-2"><span>Delivery</span><span>{{ order.delivery_fee|soles }}</span></div>
+        <div class="d-flex justify-content-between fw-bold fs-5"><span>Total</span><span>{{ order.total|soles }}</span></div>
+      </div>
+
+      <a href="{% url 'core:home' %}" class="btn-morde-dark mt-4">Volver al inicio</a>
+      <a href="{% url 'catalog:menu' %}" class="btn-morde-light mt-4">Pedir algo más</a>
+    </div>
+  </div>
+
+  {% elif cart_lines %}
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="product-card p-4" id="order-summary">
+        {% include 'orders/_summary_partial.html' %}
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <form method="post" class="product-card p-4">
+        {% csrf_token %}
+        <h5 class="mb-3">Completa tu pedido</h5>
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Nombre completo</label>
+            {{ form.customer_name|add_class:"form-control" }}
+            {% if form.customer_name.errors %}<div class="small text-danger mt-1">{{ form.customer_name.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Teléfono</label>
+            {{ form.phone|add_class:"form-control" }}
+            {% if form.phone.errors %}<div class="small text-danger mt-1">{{ form.phone.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Email (opcional, para tu confirmación)</label>
+            {{ form.email|add_class:"form-control" }}
+            {% if form.email.errors %}<div class="small text-danger mt-1">{{ form.email.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="col-12">
+            <label class="form-label d-block">Tipo de pedido</label>
+            <div class="toggle-options">
+              {% for radio in form.order_type %}
+                {{ radio.tag }}
+                <label class="btn-toggle-option" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+              {% endfor %}
+            </div>
+            {% if form.order_type.errors %}<div class="small text-danger mt-1">{{ form.order_type.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Dirección o punto de referencia</label>
+            {{ form.address|add_class:"form-control" }}
+            {% if form.address.errors %}<div class="small text-danger mt-1">{{ form.address.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="col-6">
+            <label class="form-label">Fecha</label>
+            {{ form.scheduled_date|add_class:"form-control" }}
+          </div>
+          <div class="col-6">
+            <label class="form-label">Hora</label>
+            {{ form.scheduled_time|add_class:"form-control" }}
+          </div>
+          <div class="col-12">
+            <label class="form-label">Notas del pedido (opcional)</label>
+            {{ form.notes|add_class:"form-control" }}
+          </div>
+          <div class="col-12">
+            <label class="form-label d-block">Método de pago</label>
+            <div class="toggle-options">
+              {% for radio in form.payment_method %}
+                {{ radio.tag }}
+                <label class="btn-toggle-option" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+              {% endfor %}
+            </div>
+            {% if form.payment_method.errors %}<div class="small text-danger mt-1">{{ form.payment_method.errors|join:", " }}</div>{% endif %}
+          </div>
+        </div>
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger mt-3">{{ form.non_field_errors }}</div>
+        {% elif form.errors %}
+          <div class="alert alert-danger mt-3">Revisa los campos marcados en rojo antes de continuar.</div>
+        {% endif %}
+        <button type="submit" class="btn-morde-amber mt-4 w-100 justify-content-center"><i class="bi bi-lock-fill"></i> Confirmar pedido</button>
+        <p class="small text-muted text-center mt-2 mb-0">Tus datos están protegidos</p>
+      </form>
+    </div>
+  </div>
+  {% else %}
+    <div class="text-center py-5">
+      <p class="text-muted">Tu carrito está vacío. Ve al <a href="{% url 'catalog:menu' %}">menú</a> y elige tu Mordé favorito.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+{% if not order %}
+<script src="{% static 'js/cart.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endif %}
+{% endblock %}

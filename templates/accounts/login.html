@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Iniciar sesión · Mordé{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="product-card p-4">
+        <h2 class="text-center mb-4">Iniciar sesión</h2>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Usuario</label>
+            {{ form.username|add_class:"form-control" }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            {{ form.password|add_class:"form-control" }}
+          </div>
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+          <button type="submit" class="btn-morde-amber w-100 justify-content-center">Ingresar</button>
+        </form>
+        <p class="small text-muted text-center mt-3 mb-0">
+          ¿No tienes cuenta? <a href="{% url 'accounts:signup' %}">Regístrate</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

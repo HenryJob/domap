@@ -1,0 +1,19 @@
+{% load morde_extras %}¡Hola {{ order.customer_name }}!
+
+Tu pedido #{{ order.id }} en Mordé fue confirmado.
+
+Productos:
+{% for item in order.items.all %}- {{ item.quantity }}x {{ item.product.name }} ({{ item.line_total|soles }})
+{% endfor %}
+Subtotal: {{ order.subtotal|soles }}
+Delivery: {{ order.delivery_fee|soles }}
+Total: {{ order.total|soles }}
+
+Tipo de pedido: {{ order.get_order_type_display }}
+{% if order.address %}Dirección: {{ order.address }}
+{% endif %}
+Puedes revisar el estado de tu pedido en cualquier momento aquí:
+{{ tracking_url }}
+
+¡Gracias por tu compra!
+Mordé

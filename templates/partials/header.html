@@ -5,15 +5,38 @@
       <span class="morde-logo">Mordé</span>
     </a>
     <nav class="d-none d-lg-flex gap-4">
-      <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">Inicio</a>
-      <a class="nav-link" href="{% url 'core:home' %}#nosotros">Nosotros</a>
-      <a class="nav-link {% if request.resolver_match.url_name == 'menu' %}active{% endif %}" href="{% url 'catalog:menu' %}">Menú</a>
-      <a class="nav-link" href="{% url 'core:home' %}#beneficios">Beneficios</a>
-      <a class="nav-link {% if request.resolver_match.app_name == 'orders' %}active{% endif %}" href="{% url 'orders:checkout' %}">Pedidos</a>
+      {% include 'partials/_nav_links.html' %}
     </nav>
-    <a href="{% url 'orders:checkout' %}#comprar" class="morde-cart-icon" title="Carrito">
-      🛍️
-      {% if cart_count > 0 %}<span class="morde-badge">{{ cart_count }}</span>{% endif %}
-    </a>
+    <div class="d-flex align-items-center gap-3">
+      {% include 'partials/_account_menu.html' %}
+      <a href="{% url 'cart:cart_detail' %}" class="morde-cart-icon" title="Carrito">
+        <i class="bi bi-bag"></i>
+        {% if cart_count > 0 %}<span class="morde-badge">{{ cart_count }}</span>{% endif %}
+      </a>
+      <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#morde-mobile-nav" aria-controls="morde-mobile-nav" aria-label="Abrir menú">
+        <i class="bi bi-list fs-3"></i>
+      </button>
+    </div>
   </div>
 </header>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="morde-mobile-nav" aria-labelledby="morde-mobile-nav-label">
+  <div class="offcanvas-header">
+    <span class="morde-logo" id="morde-mobile-nav-label">Mordé</span>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+  </div>
+  <div class="offcanvas-body d-flex flex-column gap-3">
+    {% include 'partials/_nav_links.html' %}
+    <hr>
+    {% if request.user.is_authenticated %}
+      <a class="nav-link" href="{% url 'accounts:profile' %}">Mi cuenta</a>
+      <a class="nav-link" href="{% url 'accounts:order_history' %}">Mis pedidos</a>
+      <form method="post" action="{% url 'accounts:logout' %}" class="m-0 p-0">
+        {% csrf_token %}
+        <button type="submit" class="nav-link btn btn-link p-0 border-0 align-baseline text-decoration-none">Salir</button>
+      </form>
+    {% else %}
+      <a class="nav-link" href="{% url 'accounts:login' %}">Ingresar</a>
+    {% endif %}
+  </div>
+</div>

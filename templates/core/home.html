@@ -14,7 +14,7 @@
         <a href="{% url 'orders:checkout' %}" class="btn-morde-dark">Quiero pedir</a>
         <a href="{% url 'catalog:menu' %}" class="btn-morde-light">Ver menú</a>
       </div>
-      <p class="small text-muted mt-3">🛵 Delivery y recojo coordinado</p>
+      <p class="small text-muted mt-3"><i class="bi bi-scooter"></i> Delivery y recojo coordinado</p>
     </div>
     <div class="col-lg-6">
       <img src="https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=900&q=80"
@@ -23,34 +23,8 @@
   </div>
 </section>
 
-<section class="container py-4" id="beneficios">
-  <h2 class="text-center mb-5">Rico, nutritivo y práctico <span class="divider-heart"></span></h2>
-  <div class="row g-4 text-center">
-    <div class="col-6 col-md-3">
-      <div class="icon-badge">🫘</div>
-      <h6>Proteína vegetal</h6>
-      <p class="small text-muted">Hecho a base de garbanzo, fuente natural de proteína.</p>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="icon-badge">🌾</div>
-      <h6>Fibra y saciedad</h6>
-      <p class="small text-muted">Aporta fibra que ayuda a sentirte bien por más tiempo.</p>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="icon-badge">🍽️</div>
-      <h6>Práctico y rápido</h6>
-      <p class="small text-muted">Pide desde donde estés. Delivery y recojo coordinado.</p>
-    </div>
-    <div class="col-6 col-md-3">
-      <div class="icon-badge">💛</div>
-      <h6>Antojo sin culpa</h6>
-      <p class="small text-muted">Disfruta algo dulce con mejor perfil nutricional.</p>
-    </div>
-  </div>
-</section>
-
 <section class="container py-5">
-  <h2 class="text-center mb-5">Descubre nuestros waffles <span class="divider-heart"></span></h2>
+  <h2 class="text-center mb-5">Descubre nuestros waffles <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
   <div class="row g-4">
     {% for product in featured_products %}
       <div class="col-6 col-md-3">
@@ -75,29 +49,31 @@
 
 {% include 'partials/steps_band.html' with steps=home_steps %}
 
-<section class="container py-5" id="nosotros">
+<section class="container py-5">
   <div class="row align-items-center g-5">
     <div class="col-lg-5">
-      <img src="https://images.unsplash.com/photo-1515543904379-3d757afe72e4?w=700&q=80"
-           class="img-fluid rounded-4" alt="Garbanzo">
+      <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=700&q=80"
+           class="img-fluid rounded-4" alt="Equipo Mordé preparando waffles">
     </div>
     <div class="col-lg-7">
-      <h2>El poder del garbanzo <span class="divider-heart"></span></h2>
-      <p class="text-muted">Usamos garbanzo porque creemos en ingredientes naturales que nutren tu cuerpo y te hacen sentir bien.</p>
-      <div class="row g-3 mt-2">
-        <div class="col-4 text-center">
-          <div class="icon-badge">💪</div>
-          <p class="small mb-0">Buena fuente de proteína vegetal</p>
-        </div>
-        <div class="col-4 text-center">
-          <div class="icon-badge">🌾</div>
-          <p class="small mb-0">Alto en fibra</p>
-        </div>
-        <div class="col-4 text-center">
-          <div class="icon-badge">💧</div>
-          <p class="small mb-0">Ingredientes reales y de calidad</p>
-        </div>
-      </div>
+      <h2>Quiénes somos <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
+      <p class="text-muted">Mordé nació de un antojo: comer algo dulce y rico, sin sentirnos mal después. Somos un equipo que prepara cada waffle al momento, con ingredientes naturales y mucho cariño.</p>
+      <a href="{% url 'core:nosotros' %}" class="btn-morde-light mt-2">Conoce nuestra historia</a>
+    </div>
+  </div>
+</section>
+
+<section class="container py-4">
+  <div class="row align-items-center g-5">
+    <div class="col-lg-6">
+      <h2>El poder del garbanzo <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
+      <p class="text-muted">Cada Mordé está hecho a base de garbanzo: más proteína, más fibra y un antojo que sí te hace bien. Conoce todo lo que le aporta a tu día.</p>
+      <a href="{% url 'core:beneficios' %}" class="btn-morde-light">Ver beneficios</a>
+    </div>
+    <div class="col-lg-6">
+      <img src="https://images.unsplash.com/photo-1515543904379-3d757afe72e4?w=700&q=80"
+           class="img-fluid rounded-4 shadow" alt="Garbanzo, ingrediente base de Mordé"
+           style="width: 100%; height: 320px; object-fit: cover;">
     </div>
   </div>
 </section>
