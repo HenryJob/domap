@@ -39,13 +39,26 @@ else
   echo ".env ya existe, se omite este paso (revísalo manualmente si necesitas cambiar algo)."
 fi
 
-echo "== 3. Construyendo y levantando el proyecto =="
+echo "== 3. Preparando db.sqlite3 =="
+# docker-compose.yml monta ./db.sqlite3 como bind mount de un archivo. Si el
+# archivo no existe en el host (clon nuevo, está en .gitignore), Docker crea
+# una carpeta en su lugar y SQLite falla con "unable to open database file".
+if [ -d db.sqlite3 ]; then
+  echo "db.sqlite3 es una carpeta (creada por error por Docker), eliminando..."
+  rm -rf db.sqlite3
+fi
+if [ ! -f db.sqlite3 ]; then
+  touch db.sqlite3
+  echo "db.sqlite3 creado."
+fi
+
+echo "== 4. Construyendo y levantando el proyecto =="
 docker compose up --build -d
 
-echo "== 4. Aplicando migraciones =="
+echo "== 5. Aplicando migraciones =="
 docker compose exec web python manage.py migrate
 
-echo "== 5. Crear superusuario (opcional) =="
+echo "== 6. Crear superusuario (opcional) =="
 read -rp "¿Quieres crear un superusuario de Django ahora? (s/n): " crear_su
 if [[ "$crear_su" == "s" || "$crear_su" == "S" ]]; then
   docker compose exec web python manage.py createsuperuser
