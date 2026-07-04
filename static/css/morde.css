@@ -14,6 +14,14 @@ body {
   background-color: var(--color-cream);
   color: var(--color-text);
   font-family: var(--font-body);
+  /* Sticky footer: el body ocupa toda la altura y <main> crece para empujar
+     el footer al fondo aunque el contenido de la página sea corto. */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main {
+  flex: 1 0 auto;
 }
 
 h1, h2, h3, h4, .font-display {
@@ -62,32 +70,80 @@ a {
 .morde-header {
   background: linear-gradient(180deg, var(--color-brown) 0%, var(--color-brown-soft) 100%);
   color: #fff;
-  padding: 1rem 0;
+  padding: 0.85rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  box-shadow: 0 2px 14px rgba(46,28,18,0.18);
 }
 .morde-header .nav-link {
+  position: relative;
   color: rgba(255,255,255,0.85);
   font-weight: 500;
+  padding: 0.25rem 0;
+  transition: color 0.2s ease;
+}
+/* Subrayado animado que crece desde el centro al hacer hover / en la activa. */
+.morde-header .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: var(--color-amber);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.25s ease;
 }
 .morde-header .nav-link.active,
 .morde-header .nav-link:hover {
   color: var(--color-amber);
 }
+.morde-header .nav-link.active::after,
+.morde-header .nav-link:hover::after {
+  transform: scaleX(1);
+}
 .morde-logo {
   font-family: var(--font-display);
   font-weight: 700;
   color: #fff;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
+  transition: color 0.2s ease;
+}
+a:hover .morde-logo {
+  color: var(--color-amber);
 }
 .morde-cart-icon {
   position: relative;
   width: 42px;
   height: 42px;
-  border: 1px solid rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.35);
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: #fff;
+  font-size: 1.15rem;
+  text-decoration: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.morde-cart-icon:hover,
+.morde-cart-icon:focus,
+.morde-cart-icon[aria-expanded="true"] {
+  background-color: var(--color-amber);
+  border-color: var(--color-amber);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.navbar-toggler {
+  border-color: rgba(255,255,255,0.4);
+  color: #fff;
+}
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(217,142,63,0.4);
 }
 .morde-badge {
   position: absolute;
@@ -96,12 +152,64 @@ a {
   background: var(--color-amber);
   color: #fff;
   font-size: 0.7rem;
+  font-weight: 600;
   border-radius: 50%;
-  width: 18px;
+  min-width: 18px;
   height: 18px;
+  padding: 0 4px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 0 0 2px var(--color-brown);
+}
+
+/* Dropdown de "Mi cuenta" con la paleta de la marca. */
+.morde-dropdown.dropdown-menu {
+  border: none;
+  border-radius: 14px;
+  padding: 0.4rem;
+  margin-top: 0.6rem;
+  min-width: 220px;
+  box-shadow: 0 10px 30px rgba(46,28,18,0.18);
+  background: #fff;
+}
+.morde-dropdown .morde-dropdown-header {
+  padding: 0.5rem 0.75rem 0.25rem;
+  font-family: var(--font-display);
+  color: var(--color-brown);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.morde-dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 9px;
+  padding: 0.55rem 0.75rem;
+  color: var(--color-brown);
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.morde-dropdown .dropdown-item i {
+  font-size: 1.05rem;
+  color: var(--color-amber-dark);
+}
+.morde-dropdown .dropdown-item:hover,
+.morde-dropdown .dropdown-item:focus {
+  background-color: var(--color-cream-soft);
+  color: var(--color-brown);
+}
+.morde-dropdown .dropdown-divider {
+  margin: 0.35rem 0.25rem;
+  border-color: rgba(46,28,18,0.12);
+}
+.morde-dropdown .morde-dropdown-logout,
+.morde-dropdown .morde-dropdown-logout i {
+  color: #b3261e;
+}
+.morde-dropdown .morde-dropdown-logout:hover {
+  background-color: rgba(179,38,30,0.08);
+  color: #b3261e;
 }
 
 /* Iconos circulares */

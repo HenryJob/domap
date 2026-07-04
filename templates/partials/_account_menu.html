@@ -3,14 +3,15 @@
     <a href="#" class="morde-cart-icon" title="Mi cuenta" data-bs-toggle="dropdown" aria-expanded="false">
       <i class="bi bi-person-circle"></i>
     </a>
-    <ul class="dropdown-menu dropdown-menu-end">
-      <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Mi cuenta</a></li>
-      <li><a class="dropdown-item" href="{% url 'accounts:order_history' %}">Mis pedidos</a></li>
+    <ul class="dropdown-menu dropdown-menu-end morde-dropdown">
+      <li class="morde-dropdown-header">Hola, {{ request.user.first_name|default:request.user.username }}</li>
+      <li><a class="dropdown-item" href="{% url 'accounts:profile' %}"><i class="bi bi-person"></i> Mi cuenta</a></li>
+      <li><a class="dropdown-item" href="{% url 'accounts:order_history' %}"><i class="bi bi-bag-check"></i> Mis pedidos</a></li>
       <li><hr class="dropdown-divider"></li>
       <li>
         <form method="post" action="{% url 'accounts:logout' %}" class="m-0 p-0">
           {% csrf_token %}
-          <button type="submit" class="dropdown-item">Salir</button>
+          <button type="submit" class="dropdown-item morde-dropdown-logout"><i class="bi bi-box-arrow-right"></i> Salir</button>
         </form>
       </li>
     </ul>
