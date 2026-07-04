@@ -82,6 +82,22 @@ class EvolutionClient:
     def logout(self):
         return self._request('DELETE', f'/instance/logout/{self.instance}')
 
+    def delete_instance(self):
+        return self._request('DELETE', f'/instance/delete/{self.instance}')
+
+    def restart_instance(self):
+        """Borra y recrea la instancia desde cero para forzar un QR nuevo.
+        Útil cuando quedó atascada en 'connecting'/'close' sin emitir QR."""
+        try:
+            self.logout()
+        except EvolutionError:
+            pass  # puede no estar logueada; no importa
+        try:
+            self.delete_instance()
+        except EvolutionError:
+            pass  # puede no existir todavía
+        return self.create_instance()
+
 
 def normalize_phone(raw, country_code=None):
     """Convierte un teléfono como 'Ej. 987 654 321' o '+51 987654321' al formato

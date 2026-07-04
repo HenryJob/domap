@@ -143,3 +143,16 @@ def whatsapp_logout(request):
     except EvolutionError as exc:
         messages.error(request, f'No se pudo desconectar: {exc}')
     return redirect('orders:whatsapp_connect')
+
+
+@staff_member_required
+@require_POST
+def whatsapp_restart(request):
+    """Borra y recrea la instancia para forzar un QR nuevo (cuando quedó
+    atascada sin generar el código)."""
+    try:
+        EvolutionClient().restart_instance()
+        messages.success(request, 'Instancia reiniciada. Espera unos segundos a que aparezca el nuevo QR.')
+    except EvolutionError as exc:
+        messages.error(request, f'No se pudo reiniciar: {exc}')
+    return redirect('orders:whatsapp_connect')

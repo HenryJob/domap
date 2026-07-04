@@ -13,4 +13,5 @@ urlpatterns = [
     path('staff/whatsapp/', views.whatsapp_connect, name='whatsapp_connect'),
     path('staff/whatsapp/estado/', views.whatsapp_state, name='whatsapp_state'),
     path('staff/whatsapp/desconectar/', views.whatsapp_logout, name='whatsapp_logout'),
+    path('staff/whatsapp/reiniciar/', views.whatsapp_restart, name='whatsapp_restart'),
 ]

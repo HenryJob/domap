@@ -30,6 +30,11 @@ services:
       - SERVER_URL=${EVOLUTION_SERVER_URL:-http://localhost:8080}
       - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY}
       - AUTHENTICATION_TYPE=apikey
+      # Versión de WhatsApp Web que usa Baileys. La que trae la imagen por
+      # defecto queda obsoleta con el tiempo y entra en bucle SIN generar el QR;
+      # fijarla a una versión vigente lo arregla. Si algún día deja de aparecer
+      # el QR, actualiza este valor (ver https://github.com/wppconnect-team/wa-version).
+      - CONFIG_SESSION_PHONE_VERSION=${WHATSAPP_WEB_VERSION:-2.3000.1042623402}
       # Base de datos (Postgres)
       - DATABASE_ENABLED=true
       - DATABASE_PROVIDER=postgresql

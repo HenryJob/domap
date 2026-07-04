@@ -47,6 +47,10 @@
         <div id="wa-qr-img-placeholder" class="text-muted my-4">Generando código QR…</div>
       {% endif %}
       <p class="text-muted small mt-3" id="wa-status">Esperando escaneo…</p>
+      <form method="post" action="{% url 'orders:whatsapp_restart' %}" class="mt-2">
+        {% csrf_token %}
+        <button type="submit" class="btn-morde-light">¿No aparece el QR? Generar uno nuevo</button>
+      </form>
     </div>
   </div>
 </section>
