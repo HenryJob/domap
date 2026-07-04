@@ -149,6 +149,20 @@ a {
   aspect-ratio: 1 / 1;
   object-fit: cover;
 }
+
+/* Recorta los lados de una imagen ancha para que se vea más grande/zoomeada
+   dentro de un contenedor más angosto, en vez de reducirla completa. */
+.img-crop-zoom {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: center;
+}
+@media (min-width: 992px) {
+  .img-crop-zoom {
+    aspect-ratio: 4 / 5;
+  }
+}
 .wishlist-toggle {
   position: absolute;
   top: 10px;
