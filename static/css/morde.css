@@ -417,21 +417,50 @@ a:hover .morde-logo {
   border-color: var(--color-amber);
   box-shadow: 0 0 0 0.2rem rgba(217,142,63,0.18);
 }
-/* Los inputs nativos de fecha/hora traen un icono de calendario/reloj;
-   lo tintamos con el ámbar de la marca y lo hacemos clickeable en toda el área. */
-.form-control[type="date"],
-.form-control[type="time"] {
+.js-date-picker,
+.js-time-picker,
+input.form-control[readonly].flatpickr-input {
   cursor: pointer;
+  background-color: #fff;
 }
-.form-control[type="date"]::-webkit-calendar-picker-indicator,
-.form-control[type="time"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  opacity: 0.7;
-  filter: sepia(1) saturate(4) hue-rotate(-15deg);
+
+/* Tema Mordé para el datepicker Flatpickr. Los selectores llevan el prefijo
+   .flatpickr-calendar para ganar en especificidad al CSS del CDN (que se carga
+   después de morde.css). */
+.flatpickr-calendar {
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(46,28,18,0.18);
+  font-family: var(--font-body);
 }
-.form-control[type="date"]::-webkit-calendar-picker-indicator:hover,
-.form-control[type="time"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
+.flatpickr-calendar .flatpickr-day.selected,
+.flatpickr-calendar .flatpickr-day.selected:hover {
+  background: var(--color-amber);
+  border-color: var(--color-amber);
+  color: #fff;
+}
+.flatpickr-calendar .flatpickr-day.today {
+  border-color: var(--color-amber);
+}
+.flatpickr-calendar .flatpickr-day.today:hover {
+  background: var(--color-amber);
+  border-color: var(--color-amber);
+  color: #fff;
+}
+.flatpickr-calendar .flatpickr-day:hover {
+  background: var(--color-cream-soft);
+}
+.flatpickr-calendar span.flatpickr-weekday {
+  color: var(--color-amber-dark);
+  font-weight: 600;
+}
+.flatpickr-calendar .flatpickr-months .flatpickr-prev-month:hover svg,
+.flatpickr-calendar .flatpickr-months .flatpickr-next-month:hover svg {
+  fill: var(--color-amber-dark);
+}
+.flatpickr-calendar .flatpickr-time input:focus,
+.flatpickr-calendar .flatpickr-time .flatpickr-am-pm:hover,
+.flatpickr-calendar .flatpickr-time .flatpickr-am-pm:focus {
+  background: var(--color-cream-soft);
 }
 
 /* Stepper de cantidad (producto y extras) */

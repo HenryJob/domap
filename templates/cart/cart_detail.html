@@ -163,8 +163,44 @@
 </section>
 {% endblock %}
 
+{% block extra_css %}
+{% if not order %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+{% endif %}
+{% endblock %}
+
 {% block extra_js %}
 {% if not order %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!window.flatpickr) return;
+    if (flatpickr.l10ns && flatpickr.l10ns.es) flatpickr.localize(flatpickr.l10ns.es);
+
+    flatpickr('.js-date-picker', {
+      dateFormat: 'Y-m-d',      // valor que recibe el backend
+      altInput: true,           // muestra un texto legible y guarda el valor real oculto
+      altFormat: 'l, j F Y',    // ej. "sábado, 4 julio 2026"
+      minDate: 'today',         // no permitir fechas pasadas
+      defaultDate: 'today',     // fecha de hoy por defecto
+      disableMobile: true,      // usa Flatpickr también en móvil (estilo uniforme)
+    });
+
+    flatpickr('.js-time-picker', {
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: 'H:i',
+      altInput: true,
+      altFormat: 'h:i K',       // ej. "12:30 PM"
+      time_24hr: false,
+      minuteIncrement: 15,
+      minTime: '08:00',         // horario de atención
+      maxTime: '21:00',
+      disableMobile: true,
+    });
+  });
+</script>
 <script src="{% static 'js/cart.js' %}?v={{ STATIC_VERSION }}"></script>
 {% endif %}
 {% endblock %}
