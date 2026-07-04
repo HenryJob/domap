@@ -8,7 +8,73 @@ services:
       - media_data:/app/media
     env_file:
       - .env
+    # La app Django habla con Evolution por el nombre de servicio de la red
+    # interna de Compose (http://evolution-api:8080), no por localhost.
+    depends_on:
+      - evolution-api
+    restart: unless-stopped
+
+  # --- WhatsApp: Evolution API + su base de datos y caché ---------------------
+  # Evolution guarda su propio estado (instancias, sesión del WhatsApp escaneado)
+  # en Postgres + Redis; es independiente del SQLite de la tienda.
+  evolution-api:
+    image: evoapicloud/evolution-api:v2.2.3
+    ports:
+      # El manager y la API quedan en http://localhost:8080. En producción
+      # conviene NO exponer este puerto al público (dejarlo solo en la red
+      # interna o detrás de Nginx con auth), ya que da control total del número.
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - SERVER_URL=${EVOLUTION_SERVER_URL:-http://localhost:8080}
+      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY}
+      - AUTHENTICATION_TYPE=apikey
+      # Base de datos (Postgres)
+      - DATABASE_ENABLED=true
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://evolution:evolution@evolution-postgres:5432/evolution
+      - DATABASE_CONNECTION_CLIENT_NAME=evolution
+      - DATABASE_SAVE_DATA_INSTANCE=true
+      - DATABASE_SAVE_DATA_NEW_MESSAGE=false
+      - DATABASE_SAVE_MESSAGE_UPDATE=false
+      - DATABASE_SAVE_DATA_CONTACTS=false
+      - DATABASE_SAVE_DATA_CHATS=false
+      # Caché (Redis)
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://evolution-redis:6379/6
+      - CACHE_REDIS_PREFIX_KEY=evolution
+      - CACHE_REDIS_SAVE_INSTANCES=false
+      - CACHE_LOCAL_ENABLED=false
+      # Muestra el QR como imagen base64 al conectar la instancia
+      - QRCODE_LIMIT=30
+      - QRCODE_COLOR=#171717
+    volumes:
+      - evolution_instances:/evolution/instances
+    depends_on:
+      - evolution-postgres
+      - evolution-redis
+    restart: unless-stopped
+
+  evolution-postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=evolution
+      - POSTGRES_USER=evolution
+      - POSTGRES_PASSWORD=evolution
+    volumes:
+      - evolution_postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  evolution-redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - evolution_redis_data:/data
     restart: unless-stopped
 
 volumes:
   media_data:
+  evolution_instances:
+  evolution_postgres_data:
+  evolution_redis_data:

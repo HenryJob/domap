@@ -148,7 +148,66 @@ docker compose logs -f web    # ver logs en vivo
 docker compose down           # detener todo
 ```
 
+## 3. WhatsApp automático (Evolution API)
+
+Cuando un cliente hace un pedido en la web, la tienda le envía por WhatsApp el
+detalle completo (productos, extras, totales, dirección, pago) **desde el número
+que el administrador conecte escaneando un QR**. Esto lo hace [Evolution API](https://doc.evolution-api.com/),
+que ya viene incluida en `docker-compose.yml` junto con su Postgres y Redis.
+
+### 3.1 Configurar la clave
+
+En `.env` define una clave secreta para Evolution (la misma la usa la API y Django):
+
+```
+EVOLUTION_API_KEY=<clave-larga-y-secreta>
+WHATSAPP_NOTIFY_ENABLED=False   # se pone en True recién después de conectar el número
+```
+
+Para generar la clave:
+
+```
+docker run --rm python:3.12-slim python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+### 3.2 Levantar todo
+
+```
+docker compose up --build -d
+```
+
+Esto arranca `web`, `evolution-api`, `evolution-postgres` y `evolution-redis`.
+Evolution queda en `http://localhost:8080` (no lo expongas al público en producción:
+déjalo solo en la red interna o detrás de Nginx con autenticación, porque da control
+total del número de WhatsApp).
+
+### 3.3 Conectar el número (escanear el QR)
+
+1. Entra al admin como staff y ve a **`http://localhost:8000/pedidos/staff/whatsapp/`**
+   (o desde *Ventas WhatsApp → Conectar WhatsApp*).
+2. Aparecerá un **código QR**. En el teléfono del negocio abre
+   **WhatsApp → Dispositivos vinculados → Vincular un dispositivo** y escanéalo.
+3. La página detecta la conexión sola y muestra **✅ Número conectado**.
+
+### 3.4 Activar el envío
+
+Una vez conectado, pon en `.env`:
+
+```
+WHATSAPP_NOTIFY_ENABLED=True
+```
+
+y reinicia solo la app para que tome el cambio:
+
+```
+docker compose up -d web
+```
+
+Desde ahí, cada pedido hecho en la web le llega al cliente por WhatsApp. Si el
+envío falla (número inválido, Evolution caído, etc.) **el pedido igual se guarda**;
+el error solo queda en los logs (`docker compose logs -f web`).
+
 ## Notas
 
 - La base de datos usada es SQLite (`db.sqlite3`), montada como bind mount — sirve para un tráfico bajo/medio. Si el proyecto crece, considera migrar a PostgreSQL.
-- Los volúmenes `media_data` y `static_data` (definidos en `docker-compose.yml`) persisten aunque borres y recrees el contenedor. Solo se pierden con `docker compose down -v`.
+- Los volúmenes `media_data`, `evolution_instances`, `evolution_postgres_data` y `evolution_redis_data` (definidos en `docker-compose.yml`) persisten aunque borres y recrees el contenedor. Solo se pierden con `docker compose down -v`. Ojo: borrar `evolution_instances` obliga a re-escanear el QR.

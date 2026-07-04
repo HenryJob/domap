@@ -155,6 +155,20 @@ INSTAGRAM_HANDLE = 'morde.waffles'
 DELIVERY_FEE = 6.00
 ABANDONMENT_WINDOW_MINUTES = 60
 
+# WhatsApp automático vía Evolution API (Docker).
+# El administrador conecta su número escaneando el QR en /pedidos/staff/whatsapp/
+# y, cuando un cliente hace un pedido en la web, ese número le envía el detalle.
+#   EVOLUTION_API_URL  URL interna de Evolution (nombre del servicio de Compose).
+#   EVOLUTION_API_KEY  clave global de la API (la misma AUTHENTICATION_API_KEY).
+#   EVOLUTION_INSTANCE nombre de la instancia (el "teléfono" conectado).
+#   WHATSAPP_COUNTRY_CODE código de país por defecto para normalizar el número.
+#   WHATSAPP_NOTIFY_ENABLED interruptor para activar el envío automático.
+EVOLUTION_API_URL = os.environ.get('EVOLUTION_API_URL', 'http://evolution-api:8080')
+EVOLUTION_API_KEY = os.environ.get('EVOLUTION_API_KEY', '')
+EVOLUTION_INSTANCE = os.environ.get('EVOLUTION_INSTANCE', 'morde')
+WHATSAPP_COUNTRY_CODE = os.environ.get('WHATSAPP_COUNTRY_CODE', '51')
+WHATSAPP_NOTIFY_ENABLED = os.environ.get('WHATSAPP_NOTIFY_ENABLED', 'False') == 'True'
+
 # Email (confirmación de pedidos)
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

@@ -4,6 +4,7 @@ from django.conf import settings
 
 from .emails import send_order_confirmation
 from .models import OrderItem, OrderItemExtra
+from .whatsapp import send_order_whatsapp
 
 
 def place_order(request, form, cart):
@@ -37,5 +38,9 @@ def place_order(request, form, cart):
 
     if order.email:
         send_order_confirmation(order, request)
+
+    # Envía el detalle del pedido al cliente por WhatsApp desde el número que el
+    # administrador conectó. No rompe el checkout si falla (lo maneja internamente).
+    send_order_whatsapp(order)
 
     return order

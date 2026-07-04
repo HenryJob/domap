@@ -10,4 +10,7 @@ urlpatterns = [
     path('rastrear/', views.order_lookup, name='order_lookup'),
     path('staff/ventas-whatsapp/', views.manual_sale_list, name='manual_sale_list'),
     path('staff/ventas-whatsapp/nueva/', views.manual_sale_create, name='manual_sale_create'),
+    path('staff/whatsapp/', views.whatsapp_connect, name='whatsapp_connect'),
+    path('staff/whatsapp/estado/', views.whatsapp_state, name='whatsapp_state'),
+    path('staff/whatsapp/desconectar/', views.whatsapp_logout, name='whatsapp_logout'),
 ]
