@@ -1,0 +1,115 @@
+{% extends 'admin/base_site.html' %}
+{% block title %}WhatsApp · {{ block.super }}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Inicio</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label='orders' %}">Orders</a>
+  &rsaquo; WhatsApp
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" style="max-width: 640px;">
+
+  {% if not enabled %}
+    <p class="help" style="background:#fff3cd;border:1px solid #ffe69c;padding:10px 12px;border-radius:6px;">
+      El envío automático está <strong>desactivado</strong>. Cuando el número esté conectado,
+      pon <code>WHATSAPP_NOTIFY_ENABLED=True</code> en el <code>.env</code> del servidor y
+      reinicia la app (<code>docker compose up -d web</code>) para que los pedidos se envíen solos.
+    </p>
+  {% endif %}
+
+  {% if error %}
+    <p class="errornote">{{ error }}</p>
+  {% endif %}
+
+  <div class="module" style="padding:20px;text-align:center;">
+    <p style="color:#666;">Instancia: <strong>{{ instance }}</strong></p>
+
+    {# --- Conectado --- #}
+    <div id="wa-connected" class="{% if state != 'open' %}hidden{% endif %}">
+      <p style="font-size:20px;">✅ <strong>Número conectado</strong></p>
+      <p style="color:#666;">Los pedidos hechos en la web se enviarán automáticamente al WhatsApp del cliente.</p>
+
+      <form method="post" action="{% url 'orders:whatsapp_test' %}" style="margin:18px 0;">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ back_url }}">
+        <label class="help" style="display:block;margin-bottom:6px;">Enviar un mensaje de prueba a un número:</label>
+        <input type="text" name="phone" placeholder="Ej. 987 654 321" required style="padding:6px;min-width:180px;">
+        <button type="submit" class="default">Enviar prueba</button>
+      </form>
+
+      <form method="post" action="{% url 'orders:whatsapp_logout' %}"
+            onsubmit="return confirm('¿Desconectar el número actual?');">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ back_url }}">
+        <button type="submit" class="button">Desconectar</button>
+      </form>
+    </div>
+
+    {# --- Sin conectar: QR --- #}
+    <div id="wa-qr" class="{% if state == 'open' %}hidden{% endif %}">
+      <p>Abre <strong>WhatsApp</strong> en el teléfono del negocio →
+        <em>Dispositivos vinculados</em> → <em>Vincular un dispositivo</em> y escanea este código:</p>
+      {% if qr_base64 %}
+        <img id="wa-qr-img" src="{{ qr_base64 }}" alt="Código QR de WhatsApp" style="max-width:280px;width:100%;height:auto;margin:8px 0;">
+      {% else %}
+        <div id="wa-qr-img-placeholder" style="color:#666;margin:24px 0;">Generando código QR…</div>
+      {% endif %}
+      <p class="help" id="wa-status">Esperando escaneo…</p>
+      <form method="post" action="{% url 'orders:whatsapp_restart' %}" style="margin-top:10px;">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ back_url }}">
+        <button type="submit" class="button">¿No aparece el QR? Generar uno nuevo</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const stateUrl = "{% url 'orders:whatsapp_state' %}";
+  const connectedEl = document.getElementById('wa-connected');
+  const qrEl = document.getElementById('wa-qr');
+  const statusEl = document.getElementById('wa-status');
+
+  function setImg(base64) {
+    let img = document.getElementById('wa-qr-img');
+    const ph = document.getElementById('wa-qr-img-placeholder');
+    if (!base64) return;
+    if (!img) {
+      img = document.createElement('img');
+      img.id = 'wa-qr-img';
+      img.alt = 'Código QR de WhatsApp';
+      img.style.maxWidth = '280px';
+      img.style.width = '100%';
+      img.style.height = 'auto';
+      img.style.margin = '8px 0';
+      if (ph) ph.replaceWith(img); else qrEl.prepend(img);
+    }
+    img.src = base64;
+  }
+
+  async function poll() {
+    try {
+      const r = await fetch(stateUrl, { headers: { 'X-Requested-With': 'fetch' } });
+      const d = await r.json();
+      if (d.state === 'open') {
+        connectedEl.classList.remove('hidden');
+        qrEl.classList.add('hidden');
+        return;
+      }
+      qrEl.classList.remove('hidden');
+      connectedEl.classList.add('hidden');
+      if (d.qr_base64) setImg(d.qr_base64);
+      if (statusEl) statusEl.textContent = d.error ? d.error : 'Esperando escaneo…';
+    } catch (e) {
+      if (statusEl) statusEl.textContent = 'Reintentando…';
+    }
+    setTimeout(poll, 4000);
+  }
+  setTimeout(poll, 4000);
+})();
+</script>
+{% endblock %}

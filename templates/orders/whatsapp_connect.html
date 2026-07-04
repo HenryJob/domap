@@ -30,7 +30,25 @@
     <div id="wa-connected" class="{% if state != 'open' %}d-none{% endif %}">
       <p class="fs-4 mb-3">✅ <strong>Número conectado</strong></p>
       <p class="text-muted">Los pedidos hechos en la web se enviarán automáticamente al WhatsApp del cliente.</p>
-      <form method="post" action="{% url 'orders:whatsapp_logout' %}" class="mt-3"
+
+      {% if not enabled %}
+        <div class="alert alert-warning small">
+          Ojo: el envío automático sigue <strong>desactivado</strong>. Pon
+          <code>WHATSAPP_NOTIFY_ENABLED=True</code> en el <code>.env</code> del servidor y
+          reinicia la app (<code>docker compose up -d web</code>).
+        </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'orders:whatsapp_test' %}" class="mt-3">
+        {% csrf_token %}
+        <label class="form-label small text-muted">Enviar un mensaje de prueba a un número:</label>
+        <div class="d-flex gap-2 justify-content-center flex-wrap">
+          <input type="text" name="phone" placeholder="Ej. 987 654 321" class="form-control" style="max-width: 220px;" required>
+          <button type="submit" class="btn-morde-amber">Enviar prueba</button>
+        </div>
+      </form>
+
+      <form method="post" action="{% url 'orders:whatsapp_logout' %}" class="mt-4"
             onsubmit="return confirm('¿Desconectar el número actual?');">
         {% csrf_token %}
         <button type="submit" class="btn-morde-light">Desconectar</button>

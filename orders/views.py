@@ -4,13 +4,14 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import Http404, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from cart.cart import Cart
 from cart.services import summary_context
 from .forms import OrderLookupForm, ManualSaleForm, ManualSaleItemFormSet
 from .models import Order, ManualSale
-from .whatsapp import EvolutionClient, EvolutionError
+from .whatsapp import EvolutionClient, EvolutionError, connection_context, normalize_phone
 
 
 def cart_summary_partial(request):
@@ -83,49 +84,28 @@ def manual_sale_list(request):
 
 
 # --- Conexión de WhatsApp (Evolution API) ---------------------------------
-def _qr_context():
-    """Estado de la conexión de WhatsApp y, si hace falta, el QR para escanear.
-    Devuelve un dict listo para la plantilla; nunca lanza."""
-    ctx = {
-        'enabled': settings.WHATSAPP_NOTIFY_ENABLED,
-        'instance': settings.EVOLUTION_INSTANCE,
-        'has_key': bool(settings.EVOLUTION_API_KEY),
-        'state': None,
-        'qr_base64': None,
-        'error': None,
-    }
-    if not ctx['has_key']:
-        ctx['error'] = 'Falta configurar EVOLUTION_API_KEY en el archivo .env.'
-        return ctx
-
-    client = EvolutionClient()
-    try:
-        state = client.connection_state()
-        if state is None:
-            # La instancia todavía no existe: créala para poder emparejar.
-            client.create_instance()
-            state = 'connecting'
-        ctx['state'] = state
-        if state != 'open':
-            data = client.connect()
-            ctx['qr_base64'] = data.get('base64') or (data.get('qrcode') or {}).get('base64')
-    except EvolutionError as exc:
-        ctx['error'] = str(exc)
-    return ctx
+def _safe_next(request, default='orders:whatsapp_connect'):
+    """Devuelve la URL de `next` si es del mismo sitio (evita open-redirect);
+    si no, la vista por defecto. Sirve para volver al admin tras una acción."""
+    nxt = request.POST.get('next') or request.GET.get('next')
+    if nxt and url_has_allowed_host_and_scheme(nxt, allowed_hosts={request.get_host()},
+                                               require_https=request.is_secure()):
+        return redirect(nxt)
+    return redirect(default)
 
 
 @staff_member_required
 def whatsapp_connect(request):
     """Página de staff: muestra el estado y el QR para que el administrador
     conecte su número de WhatsApp escaneándolo con su teléfono."""
-    return render(request, 'orders/whatsapp_connect.html', _qr_context())
+    return render(request, 'orders/whatsapp_connect.html', connection_context())
 
 
 @staff_member_required
 def whatsapp_state(request):
     """Endpoint JSON para que la página consulte el estado y refresque el QR
     sin recargar (polling mientras el admin escanea)."""
-    ctx = _qr_context()
+    ctx = connection_context()
     return JsonResponse({
         'state': ctx['state'],
         'qr_base64': ctx['qr_base64'],
@@ -142,7 +122,32 @@ def whatsapp_logout(request):
         messages.success(request, 'WhatsApp desconectado. Escanea el QR para conectar un número.')
     except EvolutionError as exc:
         messages.error(request, f'No se pudo desconectar: {exc}')
-    return redirect('orders:whatsapp_connect')
+    return _safe_next(request)
+
+
+@staff_member_required
+@require_POST
+def whatsapp_test(request):
+    """Envía un mensaje de prueba al número indicado y reporta el resultado
+    real (o el error), para diagnosticar el envío sin hacer un pedido."""
+    raw = request.POST.get('phone', '')
+    number = normalize_phone(raw)
+    if not number:
+        messages.error(request, f'El número "{raw}" no es válido.')
+        return _safe_next(request)
+
+    client = EvolutionClient()
+    state = client.connection_state()
+    if state != 'open':
+        messages.error(request, f'El número no está conectado (estado: {state or "sin instancia"}). Escanea el QR primero.')
+        return _safe_next(request)
+
+    try:
+        client.send_text(number, '✅ Prueba de Mordé: WhatsApp conectado correctamente.')
+        messages.success(request, f'Mensaje de prueba enviado a {number}. Revisa ese WhatsApp.')
+    except EvolutionError as exc:
+        messages.error(request, f'No se pudo enviar: {exc}')
+    return _safe_next(request)
 
 
 @staff_member_required
@@ -155,4 +160,4 @@ def whatsapp_restart(request):
         messages.success(request, 'Instancia reiniciada. Espera unos segundos a que aparezca el nuevo QR.')
     except EvolutionError as exc:
         messages.error(request, f'No se pudo reiniciar: {exc}')
-    return redirect('orders:whatsapp_connect')
+    return _safe_next(request)

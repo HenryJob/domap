@@ -164,6 +164,37 @@ def build_order_message(order):
     return '\n'.join(lines)
 
 
+def connection_context():
+    """Estado de la conexión de WhatsApp y, si hace falta, el QR para escanear.
+    Lo usan tanto la página de staff como la pantalla dentro de /admin. Nunca lanza."""
+    ctx = {
+        'enabled': settings.WHATSAPP_NOTIFY_ENABLED,
+        'instance': settings.EVOLUTION_INSTANCE,
+        'has_key': bool(settings.EVOLUTION_API_KEY),
+        'state': None,
+        'qr_base64': None,
+        'error': None,
+    }
+    if not ctx['has_key']:
+        ctx['error'] = 'Falta configurar EVOLUTION_API_KEY en el archivo .env.'
+        return ctx
+
+    client = EvolutionClient()
+    try:
+        state = client.connection_state()
+        if state is None:
+            # La instancia todavía no existe: créala para poder emparejar.
+            client.create_instance()
+            state = 'connecting'
+        ctx['state'] = state
+        if state != 'open':
+            data = client.connect()
+            ctx['qr_base64'] = data.get('base64') or (data.get('qrcode') or {}).get('base64')
+    except EvolutionError as exc:
+        ctx['error'] = str(exc)
+    return ctx
+
+
 def send_order_whatsapp(order):
     """Envía al cliente el detalle de su pedido por WhatsApp. Nunca lanza: si
     algo falla (WhatsApp apagado, número inválido, Evolution caído) lo registra
@@ -179,9 +210,13 @@ def send_order_whatsapp(order):
         logger.warning('Pedido #%s: teléfono "%s" no es válido para WhatsApp', order.id, order.phone)
         return False
 
+    # Captura amplia a propósito: el pedido ya está guardado, así que ni una
+    # falla de red, ni 'requests' sin instalar, ni un error de Evolution deben
+    # romper el checkout. Todo se registra en el log para diagnosticar.
     try:
         EvolutionClient().send_text(number, build_order_message(order))
-    except EvolutionError:
+    except Exception:
         logger.exception('No se pudo enviar el WhatsApp del pedido #%s', order.id)
         return False
+    logger.info('WhatsApp del pedido #%s enviado a %s', order.id, number)
     return True

@@ -109,6 +109,17 @@ class ManualSale(models.Model):
         return f'Venta WhatsApp #{self.id} · S/ {self.total_amount}'
 
 
+class WhatsAppConnection(models.Model):
+    """Modelo "fantasma" (sin tabla en la BD) que solo sirve para exponer la
+    pantalla de conexión de WhatsApp como una entrada dentro del panel /admin.
+    No guarda datos: toda la información viene de Evolution API en vivo."""
+    class Meta:
+        managed = False
+        default_permissions = ()
+        verbose_name = 'WhatsApp'
+        verbose_name_plural = 'WhatsApp (conectar número)'
+
+
 class ManualSaleItem(models.Model):
     sale = models.ForeignKey(ManualSale, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
