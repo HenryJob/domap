@@ -20,6 +20,13 @@ def whatsapp_order_link(context, message=None):
     return f'https://wa.me/{settings.WHATSAPP_NUMBER}?text={quote(text)}'
 
 
+@register.simple_tag
+def instagram_dm_link():
+    """Instagram no soporta prellenar el mensaje de un DM como wa.me; este
+    link simplemente abre el chat directo con la cuenta del negocio."""
+    return f'https://ig.me/m/{settings.INSTAGRAM_HANDLE}'
+
+
 @register.simple_tag(takes_context=True)
 def whatsapp_session_code(context):
     request = context.get('request')

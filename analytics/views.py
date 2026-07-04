@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from .models import PageView
 from .reports import build_dashboard_context
 from .services import log_whatsapp_click as _log_whatsapp_click
+from .services import log_instagram_click as _log_instagram_click
 
 
 @require_POST
@@ -42,6 +43,12 @@ def record_duration(request):
 @require_POST
 def log_whatsapp_click(request):
     _log_whatsapp_click(request)
+    return HttpResponse(status=204)
+
+
+@require_POST
+def log_instagram_click(request):
+    _log_instagram_click(request)
     return HttpResponse(status=204)
 
 

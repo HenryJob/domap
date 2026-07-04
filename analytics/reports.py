@@ -11,7 +11,10 @@ from django.utils import timezone
 
 from catalog.models import Product
 from orders.models import Order, OrderItem, ManualSale, ManualSaleItem
-from .models import VisitorSession, PageView, CartEvent, WishlistEvent, CheckoutEvent, ProductViewEvent
+from .models import (
+    VisitorSession, PageView, CartEvent, WishlistEvent, CheckoutEvent, ProductViewEvent,
+    WhatsappClickEvent, InstagramClickEvent,
+)
 
 
 def _merge_series(*series_dicts):
@@ -118,6 +121,17 @@ def build_dashboard_context(start_dt, end_dt):
         ManualSaleItem.objects.filter(sale__in=whatsapp_sales, product__isnull=False)
         .values('product__name').annotate(qty=Sum('quantity')))}
 
+    # --- Preferencia de canal directo: cuántos clientes prefieren WhatsApp vs. Instagram ---
+    whatsapp_clicks_qs = WhatsappClickEvent.objects.filter(session__is_bot=False, created_at__range=(start_dt, end_dt))
+    instagram_clicks_qs = InstagramClickEvent.objects.filter(session__is_bot=False, created_at__range=(start_dt, end_dt))
+    whatsapp_clicks_total = whatsapp_clicks_qs.count()
+    instagram_clicks_total = instagram_clicks_qs.count()
+    whatsapp_clicks_sessions = whatsapp_clicks_qs.values('session').distinct().count()
+    instagram_clicks_sessions = instagram_clicks_qs.values('session').distinct().count()
+    channel_clicks_total = whatsapp_clicks_total + instagram_clicks_total
+    whatsapp_click_share = round(whatsapp_clicks_total / channel_clicks_total * 100, 1) if channel_clicks_total else 0
+    instagram_click_share = round(instagram_clicks_total / channel_clicks_total * 100, 1) if channel_clicks_total else 0
+
     product_names = set(views_by_product) | set(adds_by_product) | set(web_sales_by_product) | set(whatsapp_sales_by_product)
     top_products = sorted([
         {
@@ -153,4 +167,10 @@ def build_dashboard_context(start_dt, end_dt):
         'visit_dates': visit_dates,
         'visit_counts': visit_counts,
         'top_products': top_products,
+        'whatsapp_clicks_total': whatsapp_clicks_total,
+        'instagram_clicks_total': instagram_clicks_total,
+        'whatsapp_clicks_sessions': whatsapp_clicks_sessions,
+        'instagram_clicks_sessions': instagram_clicks_sessions,
+        'whatsapp_click_share': whatsapp_click_share,
+        'instagram_click_share': instagram_click_share,
     }

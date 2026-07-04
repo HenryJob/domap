@@ -38,5 +38,15 @@
         });
       });
     });
+
+    document.querySelectorAll('.js-instagram-cta').forEach((link) => {
+      link.addEventListener('click', () => {
+        fetch('/analytics/evento/instagram-click/', {
+          method: 'POST',
+          headers: { 'X-CSRFToken': getCookie('csrftoken') },
+          keepalive: true,
+        });
+      });
+    });
   });
 })();

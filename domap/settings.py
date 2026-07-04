@@ -151,6 +151,7 @@ LOGIN_URL = '/admin/login/'
 # Constantes del negocio "Mordé"
 WHATSAPP_NUMBER = '51954926839'
 INSTAGRAM_URL = 'https://www.instagram.com/morde.waffles/'
+INSTAGRAM_HANDLE = 'morde.waffles'
 DELIVERY_FEE = 6.00
 ABANDONMENT_WINDOW_MINUTES = 60
 
@@ -166,5 +167,9 @@ else:
     EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'pedidos@morde.pe')
 
-# Rutas que el middleware de tracking debe ignorar por completo
-TRACKING_EXCLUDED_PREFIXES = ('/admin/', '/static/', '/media/', '/analytics/')
+# Rutas que el middleware de tracking debe ignorar por completo. Nota:
+# /analytics/panel/ (el dashboard de staff) se excluye para no inflar las
+# visitas, pero los endpoints de eventos (/analytics/evento/..., /beacon/...)
+# SÍ necesitan sesión de visitante para poder registrar el clic — no excluir
+# todo el prefijo /analytics/ o esos eventos nunca se guardan.
+TRACKING_EXCLUDED_PREFIXES = ('/admin/', '/static/', '/media/', '/analytics/panel/')

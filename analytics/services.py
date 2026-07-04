@@ -1,7 +1,7 @@
 """Funciones que el resto de apps (catalog/cart/orders) llaman para registrar
 eventos de analítica, sin que esas apps dependan de los modelos de analytics."""
 
-from .models import CartEvent, WishlistEvent, CheckoutEvent, ProductViewEvent, WhatsappClickEvent
+from .models import CartEvent, WishlistEvent, CheckoutEvent, ProductViewEvent, WhatsappClickEvent, InstagramClickEvent
 
 
 def _session_or_none(request):
@@ -46,3 +46,10 @@ def log_whatsapp_click(request):
     if session is None:
         return
     WhatsappClickEvent.objects.create(session=session)
+
+
+def log_instagram_click(request):
+    session = _session_or_none(request)
+    if session is None:
+        return
+    InstagramClickEvent.objects.create(session=session)

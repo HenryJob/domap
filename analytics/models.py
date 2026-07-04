@@ -77,3 +77,10 @@ class WhatsappClickEvent(models.Model):
     que el staff registre (o no) la venta manualmente."""
     session = models.ForeignKey(VisitorSession, on_delete=models.CASCADE, related_name='whatsapp_clicks')
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class InstagramClickEvent(models.Model):
+    """Clic en el botón de Instagram — misma señal de intención que
+    WhatsappClickEvent, para comparar cuántos clientes prefieren cada canal."""
+    session = models.ForeignKey(VisitorSession, on_delete=models.CASCADE, related_name='instagram_clicks')
+    created_at = models.DateTimeField(auto_now_add=True)

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     VisitorSession, PageView, CartEvent, WishlistEvent,
-    CheckoutEvent, ProductViewEvent, WhatsappClickEvent,
+    CheckoutEvent, ProductViewEvent, WhatsappClickEvent, InstagramClickEvent,
 )
 
 
@@ -42,4 +42,9 @@ class ProductViewEventAdmin(admin.ModelAdmin):
 
 @admin.register(WhatsappClickEvent)
 class WhatsappClickEventAdmin(admin.ModelAdmin):
+    list_display = ('session', 'created_at')
+
+
+@admin.register(InstagramClickEvent)
+class InstagramClickEventAdmin(admin.ModelAdmin):
     list_display = ('session', 'created_at')
