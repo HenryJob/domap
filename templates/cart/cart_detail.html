@@ -19,26 +19,30 @@
         <a href="{% instagram_dm_link %}" target="_blank" rel="noopener" class="js-instagram-cta">Instagram</a>.
       </p>
 
-      <div class="product-card p-4 mt-4 text-start">
-        {% for item in order.items.all %}
-          <div class="mb-2">
-            <div class="d-flex justify-content-between">
-              <span>{{ item.quantity }} x {{ item.product.name }}</span>
-              <span>{{ item.line_total|soles }}</span>
+      <div class="product-card p-4 mt-4 text-start order-confirm-summary">
+        <div class="order-confirm-items">
+          {% for item in order.items.all %}
+            <div class="mb-2">
+              <div class="d-flex justify-content-between gap-2">
+                <span>{{ item.quantity }} x {{ item.product.name }}</span>
+                <span class="text-nowrap">{{ item.line_total|soles }}</span>
+              </div>
+              {% for extra in item.extras.all %}
+                <div class="small text-muted">+ {{ extra.quantity }}x {{ extra.extra.name }} ({{ extra.unit_price|soles }} c/u)</div>
+              {% endfor %}
             </div>
-            {% for extra in item.extras.all %}
-              <div class="small text-muted">+ {{ extra.quantity }}x {{ extra.extra.name }} ({{ extra.unit_price|soles }} c/u)</div>
-            {% endfor %}
-          </div>
-        {% endfor %}
+          {% endfor %}
+        </div>
         <hr>
         <div class="d-flex justify-content-between"><span>Subtotal</span><span>{{ order.subtotal|soles }}</span></div>
         <div class="d-flex justify-content-between mb-2"><span>Delivery</span><span>{{ order.delivery_fee|soles }}</span></div>
         <div class="d-flex justify-content-between fw-bold fs-5"><span>Total</span><span>{{ order.total|soles }}</span></div>
       </div>
 
-      <a href="{% url 'core:home' %}" class="btn-morde-dark mt-4">Volver al inicio</a>
-      <a href="{% url 'catalog:menu' %}" class="btn-morde-light mt-4">Pedir algo más</a>
+      <div class="d-flex gap-2 justify-content-center flex-wrap mt-4">
+        <a href="{% url 'core:home' %}" class="btn-morde-dark">Volver al inicio</a>
+        <a href="{% url 'catalog:menu' %}" class="btn-morde-light">Pedir algo más</a>
+      </div>
     </div>
   </div>
 

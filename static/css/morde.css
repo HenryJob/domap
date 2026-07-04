@@ -150,6 +150,23 @@ a {
   object-fit: cover;
 }
 
+/* Resumen de confirmación de pedido: evita que una lista larga
+   de productos estire la tarjeta y empuje los botones fuera de vista. */
+.order-confirm-summary {
+  height: auto;
+}
+.order-confirm-items {
+  max-height: 15rem;
+  overflow-y: auto;
+}
+.order-confirm-items::-webkit-scrollbar {
+  width: 6px;
+}
+.order-confirm-items::-webkit-scrollbar-thumb {
+  background: var(--color-amber);
+  border-radius: 999px;
+}
+
 /* Recorta los lados de una imagen ancha para que se vea más grande/zoomeada
    dentro de un contenedor más angosto, en vez de reducirla completa. */
 .img-crop-zoom {
