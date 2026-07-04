@@ -581,3 +581,178 @@ input.form-control[readonly].flatpickr-input {
   color: var(--color-amber-dark);
   font-size: 0.9rem;
 }
+
+/* ==========================================================================
+   Panel de analítica (/analytics/panel/)
+   ========================================================================== */
+.dash-body {
+  background: #f4efe8;
+}
+.dash-section {
+  margin-bottom: 2rem;
+}
+.dash-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  color: var(--color-brown);
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.9rem;
+}
+.dash-section-title i {
+  color: var(--color-amber-dark);
+}
+
+/* Filtros / rangos rápidos */
+.dash-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.dash-preset {
+  border: 1.5px solid rgba(46,28,18,0.15);
+  background: #fff;
+  color: var(--color-brown);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+.dash-preset:hover {
+  border-color: var(--color-amber);
+  color: var(--color-brown);
+}
+.dash-preset.active {
+  background: var(--color-amber);
+  border-color: var(--color-amber);
+  color: #fff;
+}
+
+/* Tarjetas KPI */
+.stat-tile {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  box-shadow: 0 4px 18px rgba(46,28,18,0.06);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  border-left: 4px solid var(--color-amber);
+}
+.stat-tile .stat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.stat-label {
+  font-size: 0.78rem;
+  color: #7a6a5c;
+  font-weight: 500;
+  line-height: 1.2;
+}
+.stat-icon {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: var(--color-cream-soft);
+  color: var(--color-amber-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+}
+.stat-value {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-brown);
+  font-size: 1.7rem;
+  line-height: 1.1;
+  margin-top: 0.25rem;
+}
+.stat-value.sm {
+  font-size: 1.25rem;
+}
+.stat-sub {
+  font-size: 0.75rem;
+  color: #9a8b7d;
+  line-height: 1.25;
+}
+/* Acentos de color por tipo de KPI (borde izquierdo) */
+.stat-tile.accent-green { border-left-color: #2e9e7a; }
+.stat-tile.accent-green .stat-icon { color: #2e9e7a; }
+.stat-tile.accent-blue { border-left-color: #2f6fb0; }
+.stat-tile.accent-blue .stat-icon { color: #2f6fb0; }
+.stat-tile.accent-red { border-left-color: #c1443f; }
+.stat-tile.accent-red .stat-icon { color: #c1443f; }
+.stat-tile.accent-purple { border-left-color: #8a5cae; }
+.stat-tile.accent-purple .stat-icon { color: #8a5cae; }
+
+/* Tarjeta contenedora de gráfico */
+.chart-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.1rem 1.2rem;
+  box-shadow: 0 4px 18px rgba(46,28,18,0.06);
+  height: 100%;
+}
+.chart-card h6 {
+  color: var(--color-brown);
+  font-weight: 600;
+  margin-bottom: 0.9rem;
+}
+.chart-box {
+  position: relative;
+  height: 260px;
+}
+.chart-box.tall {
+  height: 300px;
+}
+
+/* Tablas del panel */
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.dash-table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #9a8b7d;
+  font-weight: 600;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 2px solid rgba(46,28,18,0.08);
+  text-align: left;
+}
+.dash-table td {
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid rgba(46,28,18,0.06);
+  color: var(--color-brown);
+  font-size: 0.9rem;
+}
+.dash-table tbody tr:hover {
+  background: var(--color-cream-soft);
+}
+.dash-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.dash-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-cream-soft);
+  color: var(--color-amber-dark);
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-right: 0.5rem;
+}

@@ -64,6 +64,17 @@ def dashboard(request):
     start_dt = timezone.make_aware(datetime.combine(start, datetime.min.time()), tz)
     end_dt = timezone.make_aware(datetime.combine(end, datetime.max.time()), tz)
 
+    # Rangos rápidos para el filtro. `active` marca cuál coincide con el rango actual.
+    presets = []
+    for label, days in [('Hoy', 0), ('7 días', 6), ('30 días', 29), ('90 días', 89)]:
+        p_start = today - timedelta(days=days)
+        presets.append({
+            'label': label,
+            'start': p_start.isoformat(),
+            'end': today.isoformat(),
+            'active': start == p_start and end == today,
+        })
+
     context = build_dashboard_context(start_dt, end_dt)
-    context.update({'start': start, 'end': end})
+    context.update({'start': start, 'end': end, 'presets': presets, 'range_days': (end - start).days + 1})
     return render(request, 'analytics/dashboard.html', context)
