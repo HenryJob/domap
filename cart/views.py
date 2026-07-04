@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from catalog.models import Product
 from orders.forms import OrderForm
@@ -43,7 +44,11 @@ def cart_detail(request):
     else:
         if not cart.is_empty():
             _log_checkout_started(request)
-        initial = {'order_type': 'delivery', 'payment_method': 'efectivo'}
+        initial = {
+            'order_type': 'delivery',
+            'payment_method': 'efectivo',
+            'scheduled_date': timezone.localdate(),
+        }
         if request.user.is_authenticated:
             initial['customer_name'] = request.user.first_name or request.user.username
             initial['email'] = request.user.email

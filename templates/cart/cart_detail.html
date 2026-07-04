@@ -65,7 +65,10 @@
     <div class="col-lg-5">
       <form method="post" class="product-card p-4">
         {% csrf_token %}
-        <h5 class="mb-3">O completa tu pedido aquí mismo</h5>
+        <div class="mb-3">
+          <h5 class="mb-1"><i class="bi bi-bag-heart text-amber"></i> Completa tu pedido aquí mismo</h5>
+          <p class="small text-muted mb-0">Déjanos tus datos y coordinamos la entrega o el recojo.</p>
+        </div>
         <div class="row g-3">
           <div class="col-12">
             <label class="form-label">Nombre completo</label>
@@ -97,13 +100,19 @@
             {{ form.address|add_class:"form-control" }}
             {% if form.address.errors %}<div class="small text-danger mt-1">{{ form.address.errors|join:", " }}</div>{% endif %}
           </div>
-          <div class="col-6">
-            <label class="form-label">Fecha</label>
-            {{ form.scheduled_date|add_class:"form-control" }}
+          <div class="col-12 pt-1">
+            <label class="form-label d-block mb-1 fw-semibold"><i class="bi bi-calendar-heart me-1 text-amber"></i>¿Para cuándo lo quieres?</label>
+            <p class="small text-muted mb-0">Atendemos todos los días de 8:00 a.m. a 9:00 p.m.</p>
           </div>
           <div class="col-6">
-            <label class="form-label">Hora</label>
+            <label class="form-label"><i class="bi bi-calendar-event me-1"></i>Fecha</label>
+            {{ form.scheduled_date|add_class:"form-control" }}
+            {% if form.scheduled_date.errors %}<div class="small text-danger mt-1">{{ form.scheduled_date.errors|join:", " }}</div>{% endif %}
+          </div>
+          <div class="col-6">
+            <label class="form-label"><i class="bi bi-clock me-1"></i>Hora</label>
             {{ form.scheduled_time|add_class:"form-control" }}
+            {% if form.scheduled_time.errors %}<div class="small text-danger mt-1">{{ form.scheduled_time.errors|join:", " }}</div>{% endif %}
           </div>
           <div class="col-12">
             <label class="form-label">Notas del pedido (opcional)</label>
@@ -132,7 +141,23 @@
   </div>
   {% else %}
     <div class="text-center py-5">
-      <p class="text-muted">Tu carrito está vacío. Ve al <a href="{% url 'catalog:menu' %}">menú</a> y elige tu Mordé favorito.</p>
+      <div class="icon-badge mx-auto mb-4" style="width:110px;height:110px;font-size:2.8rem;">
+        <i class="bi bi-bag-x"></i>
+      </div>
+      <h3 class="mb-2">Tu carrito está vacío</h3>
+      <p class="text-muted mb-4 mx-auto" style="max-width:440px;">
+        Aún no has agregado ningún Mordé. Explora nuestro menú de waffles saludables a base de garbanzo y arma tu pedido favorito.
+      </p>
+      <div class="d-flex gap-2 justify-content-center flex-wrap">
+        <a href="{% url 'catalog:menu' %}" class="btn-morde-dark"><i class="bi bi-egg-fried"></i> Ver el menú</a>
+        <a href="{% url 'core:home' %}" class="btn-morde-light">Volver al inicio</a>
+      </div>
+      <p class="small text-muted mt-4 mb-0">
+        ¿Prefieres pedir por chat? Escríbenos por
+        <a href="{% whatsapp_order_link 'Hola, quiero hacer un pedido.' %}" target="_blank" rel="noopener" class="js-whatsapp-cta">WhatsApp</a>
+        o
+        <a href="{% instagram_dm_link %}" target="_blank" rel="noopener" class="js-instagram-cta">Instagram</a>.
+      </p>
     </div>
   {% endif %}
 </section>

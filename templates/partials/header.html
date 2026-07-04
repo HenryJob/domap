@@ -9,7 +9,7 @@
     </nav>
     <div class="d-flex align-items-center gap-3">
       {% include 'partials/_account_menu.html' %}
-      <a href="{% url 'cart:cart_detail' %}" class="morde-cart-icon" title="Carrito">
+      <a href="{% url 'cart:cart_detail' %}" class="morde-cart-icon js-cart-icon" title="Carrito">
         <i class="bi bi-bag"></i>
         {% if cart_count > 0 %}<span class="morde-badge">{{ cart_count }}</span>{% endif %}
       </a>

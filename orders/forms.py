@@ -1,9 +1,15 @@
 from django import forms
 from django.forms import inlineformset_factory
+from django.utils import timezone
 from .models import Order, ManualSale, ManualSaleItem
 
 
 class OrderForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # No permitir elegir una fecha ya pasada en el selector de fecha.
+        self.fields['scheduled_date'].widget.attrs['min'] = timezone.localdate().isoformat()
+
     class Meta:
         model = Order
         fields = [

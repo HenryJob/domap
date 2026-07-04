@@ -20,7 +20,9 @@ function updateCartBadge(count) {
     el.style.display = count > 0 ? 'flex' : 'none';
   });
   if (count > 0 && !document.querySelector('.morde-badge')) {
-    const icon = document.querySelector('.morde-cart-icon');
+    // Debe ser el icono del carrito, no el de usuario (ambos comparten la clase
+    // .morde-cart-icon y el de usuario aparece primero en el DOM).
+    const icon = document.querySelector('.js-cart-icon');
     if (icon) {
       const badge = document.createElement('span');
       badge.className = 'morde-badge';

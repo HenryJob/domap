@@ -68,13 +68,30 @@ a {
 
 /* Header */
 .morde-header {
-  background: linear-gradient(180deg, var(--color-brown) 0%, var(--color-brown-soft) 100%);
   color: #fff;
-  padding: 0.85rem 0;
+  /* Padding inferior extra: aloja la banda ondeada sin que toque el logo/menú. */
+  padding: 0.85rem 0 2.2rem;
   position: sticky;
   top: 0;
   z-index: 1030;
-  box-shadow: 0 2px 14px rgba(46,28,18,0.18);
+}
+/* El fondo con la onda "goteo de miel" va en un ::before, NO en el header,
+   para que la máscara recorte solo el fondo y no los hijos (el dropdown de
+   usuario se abre debajo y con la máscara sobre el header quedaba cortado).
+   La máscara baja (sobresale) bajo el título y sube (se mete) en el centro;
+   mask-size 100% 100% + preserveAspectRatio='none' la estira a cualquier ancho
+   y drop-shadow hace que la sombra siga la curva. */
+.morde-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, var(--color-brown) 0%, var(--color-brown-soft) 100%);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,0%20H100%20V80%20C95,84%2090,91%2082,90%20C70,89%2064,66%2050,66%20C38,66%2030,101%2016,100%20C10,99.5%204,86%200,84%20Z'%20fill='%23fff'/%3E%3C/svg%3E") no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M0,0%20H100%20V80%20C95,84%2090,91%2082,90%20C70,89%2064,66%2050,66%20C38,66%2030,101%2016,100%20C10,99.5%204,86%200,84%20Z'%20fill='%23fff'/%3E%3C/svg%3E") no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  filter: drop-shadow(0 4px 6px rgba(46,28,18,0.22));
 }
 .morde-header .nav-link {
   position: relative;
@@ -379,6 +396,42 @@ a:hover .morde-logo {
 .btn-check:focus-visible + .btn-toggle-option {
   outline: 2px solid var(--color-amber-dark);
   outline-offset: 2px;
+}
+
+/* Utilidad de color de la marca */
+.text-amber { color: var(--color-amber-dark) !important; }
+
+/* Campos de formulario (checkout / carrito) */
+.form-label {
+  font-weight: 500;
+  color: var(--color-brown);
+  margin-bottom: 0.35rem;
+}
+.form-control {
+  border-radius: 10px;
+  border: 1.5px solid rgba(46,28,18,0.15);
+  padding: 0.55rem 0.85rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.form-control:focus {
+  border-color: var(--color-amber);
+  box-shadow: 0 0 0 0.2rem rgba(217,142,63,0.18);
+}
+/* Los inputs nativos de fecha/hora traen un icono de calendario/reloj;
+   lo tintamos con el ámbar de la marca y lo hacemos clickeable en toda el área. */
+.form-control[type="date"],
+.form-control[type="time"] {
+  cursor: pointer;
+}
+.form-control[type="date"]::-webkit-calendar-picker-indicator,
+.form-control[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+  filter: sepia(1) saturate(4) hue-rotate(-15deg);
+}
+.form-control[type="date"]::-webkit-calendar-picker-indicator:hover,
+.form-control[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
 }
 
 /* Stepper de cantidad (producto y extras) */
