@@ -150,7 +150,7 @@ LOGIN_URL = '/admin/login/'
 
 # Constantes del negocio "Mordé"
 WHATSAPP_NUMBER = '51954926839'
-INSTAGRAM_URL = 'https://www.instagram.com/rominagm123/'
+INSTAGRAM_URL = 'https://www.instagram.com/morde.waffles/'
 DELIVERY_FEE = 6.00
 ABANDONMENT_WINDOW_MINUTES = 60
 
