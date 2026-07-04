@@ -1,15 +1,9 @@
 from django import forms
 from django.forms import inlineformset_factory
-from django.utils import timezone
 from .models import Order, ManualSale, ManualSaleItem
 
 
 class OrderForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # No permitir elegir una fecha ya pasada en el selector de fecha.
-        self.fields['scheduled_date'].widget.attrs['min'] = timezone.localdate().isoformat()
-
     class Meta:
         model = Order
         fields = [
@@ -22,8 +16,17 @@ class OrderForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'placeholder': 'Ej. tucorreo@ejemplo.com (opcional)'}),
             'order_type': forms.RadioSelect(attrs={'class': 'btn-check'}),
             'address': forms.TextInput(attrs={'placeholder': 'Ej. Av. La Marina 1234, San Miguel'}),
-            'scheduled_date': forms.DateInput(attrs={'type': 'date'}),
-            'scheduled_time': forms.TimeInput(attrs={'type': 'time'}),
+            # Inputs de texto potenciados por Flatpickr (ver cart_detail.html).
+            # El formato explícito garantiza que el valor inicial (hoy) se
+            # renderice como 2026-07-04 para que Flatpickr lo lea bien.
+            'scheduled_date': forms.DateInput(
+                attrs={'class': 'js-date-picker', 'placeholder': 'Elige la fecha', 'autocomplete': 'off'},
+                format='%Y-%m-%d',
+            ),
+            'scheduled_time': forms.TimeInput(
+                attrs={'class': 'js-time-picker', 'placeholder': 'Elige la hora', 'autocomplete': 'off'},
+                format='%H:%M',
+            ),
             'notes': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Ej. Sin azúcar añadida, más miel, etc.'}),
             'payment_method': forms.RadioSelect(attrs={'class': 'btn-check'}),
         }
