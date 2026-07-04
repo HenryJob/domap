@@ -50,16 +50,12 @@
 {% include 'partials/steps_band.html' with steps=home_steps %}
 
 <section class="container py-5">
-  <div class="row align-items-center g-5">
-    <div class="col-lg-5">
-      <img src="{% static 'img/nosotros-equipo.jpg' %}?v={{ STATIC_VERSION }}"
-           class="img-fluid rounded-4" alt="Preparando pedidos de Mordé en nuestro punto de venta">
-    </div>
-    <div class="col-lg-7">
-      <h2>Quiénes somos <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
-      <p class="text-muted">Mordé nació de un antojo: comer algo dulce y rico, sin sentirnos mal después. Somos un equipo que prepara cada waffle al momento, con ingredientes naturales y mucho cariño.</p>
-      <a href="{% url 'core:nosotros' %}" class="btn-morde-light mt-2">Conoce nuestra historia</a>
-    </div>
+  <img src="{% static 'img/nosotros-equipo.jpg' %}?v={{ STATIC_VERSION }}"
+       class="img-fluid rounded-4 shadow w-100 mb-4" alt="Preparando pedidos de Mordé en nuestro punto de venta">
+  <div class="text-center">
+    <h2>Quiénes somos <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>
+    <p class="text-muted mx-auto" style="max-width: 640px;">Mordé nació de un antojo: comer algo dulce y rico, sin sentirnos mal después. Somos un equipo que prepara cada waffle al momento, con ingredientes naturales y mucho cariño.</p>
+    <a href="{% url 'core:nosotros' %}" class="btn-morde-light mt-2">Conoce nuestra historia</a>
   </div>
 </section>
 

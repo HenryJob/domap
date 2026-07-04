@@ -4,18 +4,12 @@
 
 {% block content %}
 <section class="container py-5">
-  <div class="row align-items-center g-5">
-    <div class="col-lg-5">
-      <img src="{% static 'img/nosotros-equipo.jpg' %}?v={{ STATIC_VERSION }}"
-           class="img-fluid rounded-4 shadow" alt="Preparando pedidos de Mordé en nuestro punto de venta">
-    </div>
-    <div class="col-lg-7">
-      <h1 class="display-6 fw-bold">Nosotros <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h1>
-      <p class="lead" style="color: var(--color-amber-dark);">Nacimos por un antojo: comer algo dulce y rico, sin sentirnos mal después.</p>
-      <p class="text-muted">Mordé es una marca peruana de waffles hechos a base de garbanzo. Empezamos como un proyecto pequeño, entre amigos que querían ofrecer una alternativa distinta al postre de siempre: algo que supiera igual de rico, pero que le hiciera bien a quien lo come.</p>
-      <p class="text-muted">Hoy seguimos preparando cada waffle al momento, pedido por pedido, desde nuestro punto en Miraflores, Lima — cuidando cada detalle desde la receta hasta la entrega.</p>
-    </div>
-  </div>
+  <img src="{% static 'img/nosotros-equipo.jpg' %}?v={{ STATIC_VERSION }}"
+       class="img-fluid rounded-4 shadow w-100 mb-4" alt="Preparando pedidos de Mordé en nuestro punto de venta">
+  <h1 class="display-6 fw-bold">Nosotros <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h1>
+  <p class="lead" style="color: var(--color-amber-dark);">Nacimos por un antojo: comer algo dulce y rico, sin sentirnos mal después.</p>
+  <p class="text-muted">Mordé es una marca peruana de waffles hechos a base de garbanzo. Empezamos como un proyecto pequeño, entre amigos que querían ofrecer una alternativa distinta al postre de siempre: algo que supiera igual de rico, pero que le hiciera bien a quien lo come.</p>
+  <p class="text-muted">Hoy seguimos preparando cada waffle al momento, pedido por pedido, desde nuestro punto en Miraflores, Lima — cuidando cada detalle desde la receta hasta la entrega.</p>
 </section>
 
 <section class="container py-4">
