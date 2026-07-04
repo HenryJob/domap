@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load morde_extras %}
+{% load static morde_extras %}
 {% block title %}Mordé · Waffles saludables hechos a base de garbanzo{% endblock %}
 
 {% block content %}
@@ -52,8 +52,8 @@
 <section class="container py-5">
   <div class="row align-items-center g-5">
     <div class="col-lg-5">
-      <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?w=700&q=80"
-           class="img-fluid rounded-4" alt="Equipo Mordé preparando waffles">
+      <img src="{% static 'img/nosotros-equipo.jpg' %}?v={{ STATIC_VERSION }}"
+           class="img-fluid rounded-4" alt="Preparando pedidos de Mordé en nuestro punto de venta">
     </div>
     <div class="col-lg-7">
       <h2>Quiénes somos <span class="divider-heart"><i class="bi bi-heart-fill"></i></span></h2>

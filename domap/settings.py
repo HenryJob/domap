@@ -136,7 +136,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Cache-buster para CSS/JS estáticos: súbelo cada vez que cambien para que el
 # navegador del cliente no siga sirviendo una versión vieja desde su caché.
-STATIC_VERSION = '4'
+STATIC_VERSION = '5'
 
 
 # Sessions
