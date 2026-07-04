@@ -15,5 +15,8 @@ Tipo de pedido: {{ order.get_order_type_display }}
 Puedes revisar el estado de tu pedido en cualquier momento aquí:
 {{ tracking_url }}
 
+¿Dudas o cambios en tu pedido? Escríbenos por WhatsApp: +51 954 926 839
+Instagram: {{ instagram_url }}
+
 ¡Gracias por tu compra!
 Mordé

@@ -17,6 +17,7 @@ def send_order_confirmation(order, request=None):
     body = render_to_string('orders/email/order_confirmation.txt', {
         'order': order,
         'tracking_url': tracking_url,
+        'instagram_url': settings.INSTAGRAM_URL,
     })
     try:
         send_mail(

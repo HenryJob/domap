@@ -7,6 +7,9 @@
   <div class="icon-badge mx-auto mb-3" style="width:90px;height:90px;font-size:2.2rem;"><i class="bi bi-check-circle"></i></div>
   <h1>¡Gracias por tu pedido, {{ order.customer_name }}!</h1>
   <p class="text-muted">Tu pedido #{{ order.id }} fue confirmado. Te contactaremos al {{ order.phone }} para coordinar la entrega.</p>
+  <p class="text-muted">¿Dudas o cambios en tu pedido? Escríbenos por
+    <a href="{% whatsapp_order_link 'Hola, tengo una consulta sobre mi pedido.' %}" target="_blank" rel="noopener">WhatsApp +51 954 926 839</a>.
+  </p>
 
   <div class="product-card p-4 mx-auto mt-4 text-start" style="max-width:480px;">
     {% for item in order.items.all %}

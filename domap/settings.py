@@ -74,6 +74,7 @@ TEMPLATES = [
                 'cart.context_processors.cart_badges',
                 'analytics.context_processors.tracking',
                 'core.context_processors.static_version',
+                'core.context_processors.contact_info',
             ],
         },
     },
@@ -148,7 +149,8 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 días
 LOGIN_URL = '/admin/login/'
 
 # Constantes del negocio "Mordé"
-WHATSAPP_NUMBER = '51999999999'
+WHATSAPP_NUMBER = '51954926839'
+INSTAGRAM_URL = 'https://www.instagram.com/rominagm123/'
 DELIVERY_FEE = 6.00
 ABANDONMENT_WINDOW_MINUTES = 60
 
