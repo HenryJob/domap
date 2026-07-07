@@ -17,7 +17,10 @@
       </a>
       <div class="d-flex gap-2">
         <a href="{% url 'core:home' %}" class="btn-morde-light bg-white btn-sm"><i class="bi bi-arrow-left"></i> Volver al sitio</a>
-        <a href="{% url 'admin:logout' %}" class="btn-morde-light bg-white btn-sm"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+        <form action="{% url 'admin:logout' %}" method="post" class="d-inline">
+          {% csrf_token %}
+          <button type="submit" class="btn-morde-light bg-white btn-sm"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
+        </form>
       </div>
     </div>
   </header>
