@@ -39,11 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',
     'core',
-    'accounts',
     'catalog',
     'cart',
     'orders',
     'analytics',
+    'panel',
 ]
 
 MIDDLEWARE = [
@@ -136,7 +136,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Cache-buster para CSS/JS estáticos: súbelo cada vez que cambien para que el
 # navegador del cliente no siga sirviendo una versión vieja desde su caché.
-STATIC_VERSION = '15'
+STATIC_VERSION = '22'
 
 
 # Sessions
@@ -152,7 +152,6 @@ LOGIN_URL = '/admin/login/'
 WHATSAPP_NUMBER = '51954926839'
 INSTAGRAM_URL = 'https://www.instagram.com/morde.waffles/'
 INSTAGRAM_HANDLE = 'morde.waffles'
-DELIVERY_FEE = 6.00
 ABANDONMENT_WINDOW_MINUTES = 60
 
 # WhatsApp automático vía Evolution API (Docker).
@@ -186,4 +185,4 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'pedidos@morde.pe')
 # visitas, pero los endpoints de eventos (/analytics/evento/..., /beacon/...)
 # SÍ necesitan sesión de visitante para poder registrar el clic — no excluir
 # todo el prefijo /analytics/ o esos eventos nunca se guardan.
-TRACKING_EXCLUDED_PREFIXES = ('/admin/', '/static/', '/media/', '/analytics/panel/')
+TRACKING_EXCLUDED_PREFIXES = ('/admin/', '/static/', '/media/', '/analytics/panel/', '/panel/')

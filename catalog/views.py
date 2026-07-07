@@ -1,11 +1,6 @@
 from django.shortcuts import render
 from .models import Product, Extra
-
-MENU_STEPS = [
-    {'icon': '🛍️', 'title': 'Elige tu producto', 'description': 'Explora nuestro menú y selecciona tu Mordé favorito.'},
-    {'icon': '📞', 'title': 'Define cómo pedir', 'description': 'Elige entre delivery o recojo y confirma tus datos.'},
-    {'icon': '🛵', 'title': 'Recibe por delivery o recojo coordinado', 'description': 'Lo preparamos al momento y lo recibes fresco y delicioso.'},
-]
+from core.constants import SALE_STEPS
 
 
 def menu(request):
@@ -24,6 +19,6 @@ def menu(request):
         'waffles': waffles,
         'combos': combos,
         'extras': extras,
-        'menu_steps': MENU_STEPS,
+        'menu_steps': SALE_STEPS,
     }
     return render(request, 'catalog/menu.html', context)

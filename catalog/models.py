@@ -12,6 +12,9 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/', blank=True, null=True)
     is_combo = models.BooleanField(default=False)
     is_customizable = models.BooleanField(default=False)
+    combo_products = models.ManyToManyField(
+        'self', blank=True, symmetrical=False, related_name='included_in_combos',
+        help_text='Productos que incluye este combo (solo aplica si es_combo está activo).')
     is_active = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False, help_text='Aparece en el preview de la página de Inicio')
     display_order = models.PositiveIntegerField(default=0)

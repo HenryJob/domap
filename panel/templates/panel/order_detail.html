@@ -1,0 +1,69 @@
+{% extends 'panel/_base.html' %}
+{% load widget_tweaks %}
+{% block title %}Pedido #{{ order.id }}{% endblock %}
+{% block panel_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="dash-section-title mb-0"><i class="bi bi-bag-check"></i> Pedido #{{ order.id }}</h2>
+  <a href="{% url 'panel:order_list' %}" class="btn-morde-light bg-white btn-sm"><i class="bi bi-arrow-left"></i> Volver</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="chart-card mb-3">
+      <h6>Cliente</h6>
+      <p class="mb-1"><strong>{{ order.customer_name }}</strong></p>
+      <p class="mb-1 text-muted">{{ order.phone }}{% if order.email %} · {{ order.email }}{% endif %}</p>
+      <p class="mb-0 text-muted small">
+        {{ order.get_order_type_display }}
+        {% if order.order_type == 'delivery' %} · {{ order.delivery_zone.name|default:"sin zona" }} · {{ order.address }}{% endif %}
+      </p>
+      {% if order.scheduled_date %}
+        <p class="mb-0 text-muted small">Programado: {{ order.scheduled_date|date:"d/m/Y" }} {{ order.scheduled_time|time:"H:i" }}</p>
+      {% endif %}
+      {% if order.notes %}<p class="mb-0 text-muted small">Nota: {{ order.notes }}</p>{% endif %}
+    </div>
+
+    <div class="chart-card">
+      <h6>Productos</h6>
+      <div class="table-responsive">
+        <table class="dash-table">
+          <thead><tr><th>Producto</th><th class="num">Cant.</th><th class="num">Precio</th><th class="num">Subtotal</th></tr></thead>
+          <tbody>
+            {% for item in order.items.all %}
+            <tr>
+              <td>
+                {{ item.product.name }}
+                {% for extra in item.extras.all %}
+                  <div class="text-muted small">+ {{ extra.quantity }}x {{ extra.extra.name }}</div>
+                {% endfor %}
+              </td>
+              <td class="num">{{ item.quantity }}</td>
+              <td class="num">S/ {{ item.unit_price }}</td>
+              <td class="num">S/ {{ item.line_total }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="text-end mt-2">
+        <p class="mb-1 text-muted">Subtotal: S/ {{ order.subtotal }}</p>
+        <p class="mb-1 text-muted">Delivery: S/ {{ order.delivery_fee }}</p>
+        <p class="mb-0 fs-5"><strong>Total: S/ {{ order.total }}</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="chart-card">
+      <h6>Estado y pago</h6>
+      <p class="text-muted small mb-3">Pago: {{ order.get_payment_method_display }}</p>
+      <form method="post">
+        {% csrf_token %}
+        <label class="form-label">Estado del pedido</label>
+        {{ form.status|add_class:"form-select mb-3" }}
+        <button type="submit" class="btn-morde-amber"><i class="bi bi-check-lg"></i> Actualizar estado</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

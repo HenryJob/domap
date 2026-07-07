@@ -1,0 +1,66 @@
+{% extends 'panel/_base.html' %}
+{% block title %}Productos{% endblock %}
+{% block panel_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="dash-section-title mb-0"><i class="bi bi-egg-fried"></i> Productos</h2>
+  <a href="{% url 'panel:product_create' %}" class="btn-morde-amber btn-sm"><i class="bi bi-plus-lg"></i> Nuevo producto</a>
+</div>
+
+<form method="get" class="panel-filter-bar mb-3">
+  <div class="field">
+    <label>Buscar</label>
+    <input type="text" name="q" value="{{ q }}" placeholder="Nombre o descripción" class="form-control form-control-sm">
+  </div>
+  <div class="field field-sm">
+    <label>Combo</label>
+    <select name="is_combo" class="form-select form-select-sm">
+      <option value="">Todos</option>
+      <option value="1" {% if is_combo == '1' %}selected{% endif %}>Sí</option>
+      <option value="0" {% if is_combo == '0' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+  <div class="field field-sm">
+    <label>Activo</label>
+    <select name="is_active" class="form-select form-select-sm">
+      <option value="">Todos</option>
+      <option value="1" {% if is_active == '1' %}selected{% endif %}>Sí</option>
+      <option value="0" {% if is_active == '0' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+  <div class="actions">
+    <button type="submit" class="btn-morde-amber btn-sm"><i class="bi bi-funnel"></i> Filtrar</button>
+    <a href="{% url 'panel:product_list' %}" class="btn-morde-light bg-white btn-sm">Limpiar</a>
+  </div>
+</form>
+
+<div class="chart-card">
+  <div class="table-responsive">
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>Producto</th><th>Precio</th><th>Combo</th><th>Activo</th><th>Destacado</th><th>Orden</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td>{{ p.name }}</td>
+          <td>{% if p.price_is_from %}Desde{% endif %} S/ {{ p.price }}</td>
+          <td>{% if p.is_combo %}<i class="bi bi-check-circle-fill text-success"></i>{% else %}—{% endif %}</td>
+          <td>{% if p.is_active %}<span class="badge bg-success">Sí</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+          <td>{% if p.is_featured %}<i class="bi bi-star-fill text-warning"></i>{% else %}—{% endif %}</td>
+          <td class="num">{{ p.display_order }}</td>
+          <td class="text-end">
+            <a href="{% url 'panel:product_edit' p.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'panel:product_delete' p.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-muted text-center py-3">No hay productos todavía.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'panel/_pagination.html' %}
+</div>
+{% endblock %}

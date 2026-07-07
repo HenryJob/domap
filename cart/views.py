@@ -41,6 +41,8 @@ def cart_detail(request):
             order = place_order(request, form, cart)
             success_url = reverse('cart:cart_detail') + f'?order={order.id}&t={order.access_token}'
             return redirect(success_url)
+        context = {'form': form, **summary_context(cart, form.cleaned_data.get('delivery_zone'))}
+        return render(request, 'cart/cart_detail.html', context)
     else:
         if not cart.is_empty():
             _log_checkout_started(request)

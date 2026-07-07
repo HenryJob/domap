@@ -1,12 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'panel/_base.html' %}
 {% load widget_tweaks %}
-{% block title %}Registrar venta manual · Staff Mordé{% endblock %}
+{% block title %}Registrar venta manual{% endblock %}
+{% block panel_content %}
+<h2 class="dash-section-title"><i class="bi bi-chat-dots"></i> Registrar venta manual</h2>
+<p class="text-muted">Usa esto para registrar un pedido cerrado por WhatsApp o Instagram (fuera de la web), para que cuente en la conversión y en los ingresos del panel de analítica.</p>
 
-{% block content %}
-<section class="container py-5" style="max-width:760px;">
-  <h2 class="mb-4">Registrar venta manual</h2>
-  <p class="text-muted">Usa esto para registrar un pedido cerrado por WhatsApp o Instagram (fuera de la web), para que cuente en la conversión y en los ingresos del panel de analítica.</p>
-
+<div class="chart-card">
   <form method="post">
     {% csrf_token %}
     <div class="row g-3">
@@ -33,7 +32,7 @@
       <div class="col-md-6">
         <label class="form-label">Código de sesión (opcional)</label>
         {{ form.session_reference|add_class:"form-control" }}
-        <div class="form-text">Cópialo del mensaje de WhatsApp del cliente, si lo compartió.</div>
+        <div class="form-text">Cópialo del mensaje del cliente, si lo compartió.</div>
       </div>
       <div class="col-12">
         <label class="form-label">Notas</label>
@@ -59,8 +58,10 @@
       </table>
     </div>
 
-    <button type="submit" class="btn-morde-amber">Guardar venta</button>
-    <a href="{% url 'orders:manual_sale_list' %}" class="btn-morde-light">Cancelar</a>
+    <div class="mt-4 d-flex gap-2">
+      <button type="submit" class="btn-morde-amber"><i class="bi bi-check-lg"></i> Guardar venta</button>
+      <a href="{% url 'panel:manual_sale_list' %}" class="btn-morde-light bg-white">Cancelar</a>
+    </div>
   </form>
-</section>
+</div>
 {% endblock %}

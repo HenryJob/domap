@@ -6,6 +6,22 @@ from django.utils import timezone
 from catalog.models import Product, Extra
 
 
+class DeliveryZone(models.Model):
+    """Distrito de Lima Metropolitana con su costo de delivery. Se administra
+    desde /admin para poder ajustar precios por zona sin tocar código."""
+    name = models.CharField(max_length=80, unique=True)
+    fee = models.DecimalField(max_digits=8, decimal_places=2)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Zona de delivery'
+        verbose_name_plural = 'Zonas de delivery'
+
+    def __str__(self):
+        return f'{self.name} · S/ {self.fee}'
+
+
 class Order(models.Model):
     ORDER_TYPE_CHOICES = [('delivery', 'Delivery'), ('recojo', 'Recojo')]
     PAYMENT_CHOICES = [
@@ -39,6 +55,8 @@ class Order(models.Model):
     phone = models.CharField(max_length=20)
     email = models.CharField(max_length=254, blank=True)
     order_type = models.CharField(max_length=10, choices=ORDER_TYPE_CHOICES, default='delivery')
+    delivery_zone = models.ForeignKey(
+        DeliveryZone, null=True, blank=True, on_delete=models.PROTECT, related_name='orders')
     address = models.CharField(max_length=255, blank=True)
     scheduled_date = models.DateField(null=True, blank=True)
     scheduled_time = models.TimeField(null=True, blank=True)
@@ -89,8 +107,13 @@ class OrderItemExtra(models.Model):
 
 
 class ManualSale(models.Model):
-    """Venta cerrada por WhatsApp y registrada manualmente por el staff,
-    para que cuente en la conversión total y los ingresos del dashboard."""
+    """Venta cerrada por WhatsApp o Instagram y registrada manualmente por el
+    staff, para que cuente en la conversión total y los ingresos del dashboard."""
+    CHANNEL_CHOICES = [
+        ('whatsapp', 'WhatsApp'),
+        ('instagram', 'Instagram'),
+    ]
+    channel = models.CharField(max_length=10, choices=CHANNEL_CHOICES, default='whatsapp')
     customer_name = models.CharField(max_length=120, blank=True)
     phone = models.CharField(max_length=20, blank=True)
     sale_date = models.DateTimeField(default=timezone.now)
@@ -106,7 +129,7 @@ class ManualSale(models.Model):
         ordering = ['-sale_date']
 
     def __str__(self):
-        return f'Venta WhatsApp #{self.id} · S/ {self.total_amount}'
+        return f'Venta {self.get_channel_display()} #{self.id} · S/ {self.total_amount}'
 
 
 class WhatsAppConnection(models.Model):

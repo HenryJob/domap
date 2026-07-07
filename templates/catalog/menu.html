@@ -63,6 +63,12 @@
             <div class="flex-grow-1">
               <h6 class="mb-1">{{ combo.name }}</h6>
               <p class="small text-muted mb-2">{{ combo.description }}</p>
+              {% if combo.combo_products.all %}
+                <p class="small mb-2">
+                  <strong>Incluye:</strong>
+                  {% for included in combo.combo_products.all %}{{ included.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                </p>
+              {% endif %}
               <div class="d-flex align-items-center justify-content-between">
                 <strong>{{ combo.price|soles }}</strong>
                 <button type="button" class="btn-morde-light js-add-to-cart" data-product-id="{{ combo.id }}">Pedir combo</button>

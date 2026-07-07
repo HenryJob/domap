@@ -8,7 +8,6 @@
       {% include 'partials/_nav_links.html' %}
     </nav>
     <div class="d-flex align-items-center gap-3">
-      {% include 'partials/_account_menu.html' %}
       <a href="{% url 'cart:cart_detail' %}" class="morde-cart-icon js-cart-icon" title="Carrito">
         <i class="bi bi-bag"></i>
         {% if cart_count > 0 %}<span class="morde-badge">{{ cart_count }}</span>{% endif %}
@@ -27,16 +26,5 @@
   </div>
   <div class="offcanvas-body d-flex flex-column gap-3">
     {% include 'partials/_nav_links.html' %}
-    <hr>
-    {% if request.user.is_authenticated %}
-      <a class="nav-link" href="{% url 'accounts:profile' %}">Mi cuenta</a>
-      <a class="nav-link" href="{% url 'accounts:order_history' %}">Mis pedidos</a>
-      <form method="post" action="{% url 'accounts:logout' %}" class="m-0 p-0">
-        {% csrf_token %}
-        <button type="submit" class="nav-link btn btn-link p-0 border-0 align-baseline text-decoration-none">Salir</button>
-      </form>
-    {% else %}
-      <a class="nav-link" href="{% url 'accounts:login' %}">Ingresar</a>
-    {% endif %}
   </div>
 </div>

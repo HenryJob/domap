@@ -1,10 +1,8 @@
 from decimal import Decimal
 
-from django.conf import settings
 
-
-def summary_context(cart):
-    delivery_fee = Decimal(str(settings.DELIVERY_FEE))
+def summary_context(cart, delivery_zone=None):
+    delivery_fee = delivery_zone.fee if delivery_zone else Decimal('0')
     cart_subtotal = cart.subtotal()
     return {
         'cart_lines': cart.lines(),

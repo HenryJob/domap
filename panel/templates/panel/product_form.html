@@ -1,0 +1,78 @@
+{% extends 'panel/_base.html' %}
+{% load widget_tweaks %}
+{% block title %}{% if product %}Editar producto{% else %}Nuevo producto{% endif %}{% endblock %}
+{% block panel_content %}
+<h2 class="dash-section-title"><i class="bi bi-egg-fried"></i> {% if product %}Editar {{ product.name }}{% else %}Nuevo producto{% endif %}</h2>
+<div class="chart-card">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-8">
+        <label class="form-label">Nombre</label>
+        {{ form.name|add_class:"form-control" }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Slug</label>
+        {{ form.slug|add_class:"form-control" }}
+      </div>
+      <div class="col-12">
+        <label class="form-label">Descripción</label>
+        {{ form.description|add_class:"form-control" }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Precio (S/)</label>
+        {{ form.price|add_class:"form-control" }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Orden de aparición</label>
+        {{ form.display_order|add_class:"form-control" }}
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Imagen</label>
+        {{ form.image|add_class:"form-control" }}
+        {% if product.image %}<div class="form-text">Actual: {{ product.image.name }}</div>{% endif %}
+      </div>
+      <div class="col-md-3">
+        <div class="form-check mt-4">
+          {{ form.price_is_from|add_class:"form-check-input" }}
+          <label class="form-check-label" for="{{ form.price_is_from.id_for_label }}">Precio "Desde"</label>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-check mt-4">
+          {{ form.is_customizable|add_class:"form-check-input" }}
+          <label class="form-check-label" for="{{ form.is_customizable.id_for_label }}">Personalizable</label>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-check mt-4">
+          {{ form.is_active|add_class:"form-check-input" }}
+          <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Activo</label>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-check mt-4">
+          {{ form.is_featured|add_class:"form-check-input" }}
+          <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">Destacado en Inicio</label>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="form-check">
+          {{ form.is_combo|add_class:"form-check-input" }}
+          <label class="form-check-label" for="{{ form.is_combo.id_for_label }}">Es un combo</label>
+        </div>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Productos incluidos (solo si es combo)</label>
+        <div class="border rounded p-2" style="max-height: 220px; overflow-y: auto;">
+          {{ form.combo_products }}
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 d-flex gap-2">
+      <button type="submit" class="btn-morde-amber"><i class="bi bi-check-lg"></i> Guardar</button>
+      <a href="{% url 'panel:product_list' %}" class="btn-morde-light bg-white">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

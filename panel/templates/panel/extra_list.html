@@ -1,0 +1,52 @@
+{% extends 'panel/_base.html' %}
+{% block title %}Extras{% endblock %}
+{% block panel_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="dash-section-title mb-0"><i class="bi bi-plus-circle"></i> Extras</h2>
+  <a href="{% url 'panel:extra_create' %}" class="btn-morde-amber btn-sm"><i class="bi bi-plus-lg"></i> Nuevo extra</a>
+</div>
+
+<form method="get" class="panel-filter-bar mb-3">
+  <div class="field">
+    <label>Buscar</label>
+    <input type="text" name="q" value="{{ q }}" placeholder="Nombre" class="form-control form-control-sm">
+  </div>
+  <div class="field field-sm">
+    <label>Activo</label>
+    <select name="is_active" class="form-select form-select-sm">
+      <option value="">Todos</option>
+      <option value="1" {% if is_active == '1' %}selected{% endif %}>Sí</option>
+      <option value="0" {% if is_active == '0' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+  <div class="actions">
+    <button type="submit" class="btn-morde-amber btn-sm"><i class="bi bi-funnel"></i> Filtrar</button>
+    <a href="{% url 'panel:extra_list' %}" class="btn-morde-light bg-white btn-sm">Limpiar</a>
+  </div>
+</form>
+
+<div class="chart-card">
+  <div class="table-responsive">
+    <table class="dash-table">
+      <thead><tr><th>Extra</th><th>Precio</th><th>Activo</th><th>Orden</th><th></th></tr></thead>
+      <tbody>
+        {% for e in extras %}
+        <tr>
+          <td>{{ e.icon_emoji }} {{ e.name }}</td>
+          <td>S/ {{ e.price }}</td>
+          <td>{% if e.is_active %}<span class="badge bg-success">Sí</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+          <td class="num">{{ e.display_order }}</td>
+          <td class="text-end">
+            <a href="{% url 'panel:extra_edit' e.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'panel:extra_delete' e.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-muted text-center py-3">No hay extras todavía.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'panel/_pagination.html' %}
+</div>
+{% endblock %}

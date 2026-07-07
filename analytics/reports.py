@@ -2,19 +2,41 @@
 (sin Celery/cron) ya que el volumen esperado es de un negocio pequeño."""
 
 import statistics
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db.models import Sum, Count, Max, Avg
 from django.db.models.functions import TruncDate, ExtractHour
+from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 
 from catalog.models import Product
 from orders.models import Order, OrderItem, ManualSale, ManualSaleItem
+from .constants import PAGE_LABELS
 from .models import (
     VisitorSession, PageView, CartEvent, WishlistEvent, CheckoutEvent, ProductViewEvent,
     WhatsappClickEvent, InstagramClickEvent,
 )
+
+
+# Vistas de PAGE_LABELS que requieren argumentos para reverse(); se muestra el
+# patrón de la URL (con placeholder) en vez de una ruta histórica concreta.
+_PARAMETRIZED_ROUTE_PATTERNS = {
+    'orders:order_success': '/pedidos/confirmacion/<id>/',
+}
+
+
+def _current_route(view_name):
+    """Resuelve la ruta ACTUAL (según las urls.py vigentes) para un view_name
+    de PAGE_LABELS, en vez de reusar el `path` histórico guardado en PageView
+    (que puede haber quedado obsoleto si la URL cambió)."""
+    if view_name in _PARAMETRIZED_ROUTE_PATTERNS:
+        return _PARAMETRIZED_ROUTE_PATTERNS[view_name]
+    try:
+        return reverse(view_name)
+    except NoReverseMatch:
+        return None
 
 
 def _merge_series(*series_dicts):
@@ -67,6 +89,40 @@ def _labels_and_counts(counter, order):
     return labels, values
 
 
+def resolve_dashboard_context(request):
+    """Lee el rango de fechas de la querystring, arma los presets rápidos y
+    devuelve el contexto completo del dashboard. Compartido por las vistas
+    de /panel/analitica/ y /analytics/panel/ para no duplicar esta lógica."""
+    today = timezone.localdate()
+    end = parse_date(request.GET.get('end', '')) or today
+    start = parse_date(request.GET.get('start', '')) or (end - timedelta(days=30))
+    if start > end:
+        start, end = end, start
+
+    tz = timezone.get_current_timezone()
+    start_dt = timezone.make_aware(datetime.combine(start, datetime.min.time()), tz)
+    end_dt = timezone.make_aware(datetime.combine(end, datetime.max.time()), tz)
+
+    presets = []
+    for label, days in [('Hoy', 0), ('7 días', 6), ('30 días', 29), ('90 días', 89)]:
+        p_start = today - timedelta(days=days)
+        presets.append({
+            'label': label,
+            'start': p_start.isoformat(),
+            'end': today.isoformat(),
+            'active': start == p_start and end == today,
+        })
+
+    context = build_dashboard_context(start_dt, end_dt)
+    context.update({
+        'start': start,
+        'end': end,
+        'presets': presets,
+        'range_days': (end - start).days + 1,
+    })
+    return context
+
+
 def build_dashboard_context(start_dt, end_dt):
     sessions_qs = VisitorSession.objects.filter(is_bot=False, first_seen__range=(start_dt, end_dt))
     visits = sessions_qs.count()
@@ -98,7 +154,10 @@ def build_dashboard_context(start_dt, end_dt):
 
     # --- Abandono de carrito ---
     window_minutes = settings.ABANDONMENT_WINDOW_MINUTES
-    cutoff = timezone.now() - timedelta(minutes=window_minutes)
+    # El corte se calcula respecto al final del rango consultado (o "ahora" si el
+    # rango incluye el presente), para que un rango histórico no mida abandono
+    # contra el momento actual.
+    cutoff = min(timezone.now(), end_dt) - timedelta(minutes=window_minutes)
     stale_candidates = (cart_events_qs.filter(event_type='add')
                          .values('session_id').annotate(last_add=Max('created_at'))
                          .filter(last_add__lt=cutoff))
@@ -117,12 +176,18 @@ def build_dashboard_context(start_dt, end_dt):
     ]
     abandonment_rate = (len(abandoned_keys) / len(candidate_session_keys) * 100) if candidate_session_keys else 0
 
-    # --- KPI de ventas combinadas (web + WhatsApp registrado manualmente) ---
-    whatsapp_sales = ManualSale.objects.filter(sale_date__range=(start_dt, end_dt))
+    # --- KPI de ventas combinadas (web + WhatsApp + Instagram, ambas registradas manualmente) ---
+    manual_sales = ManualSale.objects.filter(sale_date__range=(start_dt, end_dt))
+    whatsapp_sales = manual_sales.filter(channel='whatsapp')
+    instagram_sales = manual_sales.filter(channel='instagram')
     web_revenue = web_orders.aggregate(s=Sum('total'))['s'] or 0
     whatsapp_revenue = whatsapp_sales.aggregate(s=Sum('total_amount'))['s'] or 0
-    combined_revenue = web_revenue + whatsapp_revenue
-    combined_sales_count = web_orders.count() + whatsapp_sales.count()
+    instagram_revenue = instagram_sales.aggregate(s=Sum('total_amount'))['s'] or 0
+    combined_revenue = web_revenue + whatsapp_revenue + instagram_revenue
+    web_sales_count = web_orders.count()
+    whatsapp_sales_count = whatsapp_sales.count()
+    instagram_sales_count = instagram_sales.count()
+    combined_sales_count = web_sales_count + whatsapp_sales_count + instagram_sales_count
     conversion_rate = (combined_sales_count / visits * 100) if visits else 0
 
     # --- Ventas en el tiempo ---
@@ -134,8 +199,13 @@ def build_dashboard_context(start_dt, end_dt):
         row['day'].isoformat(): float(row['total'])
         for row in whatsapp_sales.annotate(day=TruncDate('sale_date')).values('day').annotate(total=Sum('total_amount'))
     }
-    sales_dates, (web_series, whatsapp_series) = _merge_series(web_by_day, whatsapp_by_day)
-    combined_series = [w + wa for w, wa in zip(web_series, whatsapp_series)]
+    instagram_by_day = {
+        row['day'].isoformat(): float(row['total'])
+        for row in instagram_sales.annotate(day=TruncDate('sale_date')).values('day').annotate(total=Sum('total_amount'))
+    }
+    sales_dates, (web_series, whatsapp_series, instagram_series) = _merge_series(
+        web_by_day, whatsapp_by_day, instagram_by_day)
+    combined_series = [w + wa + ig for w, wa, ig in zip(web_series, whatsapp_series, instagram_series)]
 
     # --- Visitas en el tiempo ---
     visits_by_day = {
@@ -164,6 +234,9 @@ def build_dashboard_context(start_dt, end_dt):
     whatsapp_sales_by_product = {r['product__name']: r['qty'] for r in (
         ManualSaleItem.objects.filter(sale__in=whatsapp_sales, product__isnull=False)
         .values('product__name').annotate(qty=Sum('quantity')))}
+    instagram_sales_by_product = {r['product__name']: r['qty'] for r in (
+        ManualSaleItem.objects.filter(sale__in=instagram_sales, product__isnull=False)
+        .values('product__name').annotate(qty=Sum('quantity')))}
     wishlist_by_product = {r['product__name']: r['n'] for r in (
         wishlist_events_qs.filter(event_type='add').values('product__name').annotate(n=Count('id')))}
 
@@ -179,17 +252,30 @@ def build_dashboard_context(start_dt, end_dt):
     instagram_click_share = round(instagram_clicks_total / channel_clicks_total * 100, 1) if channel_clicks_total else 0
 
     product_names = (set(views_by_product) | set(adds_by_product) | set(web_sales_by_product)
-                     | set(whatsapp_sales_by_product) | set(wishlist_by_product))
+                     | set(whatsapp_sales_by_product) | set(instagram_sales_by_product) | set(wishlist_by_product))
     top_products = sorted([
         {
             'name': name,
             'views': views_by_product.get(name, 0),
             'cart_adds': adds_by_product.get(name, 0),
             'wishlist': wishlist_by_product.get(name, 0),
-            'sales': web_sales_by_product.get(name, 0) + whatsapp_sales_by_product.get(name, 0),
+            'sales': (web_sales_by_product.get(name, 0) + whatsapp_sales_by_product.get(name, 0)
+                      + instagram_sales_by_product.get(name, 0)),
+            # % de vistas de este producto que terminaron en un agregado al carrito.
+            'view_to_cart_rate': (
+                round(adds_by_product.get(name, 0) / views_by_product[name] * 100, 1)
+                if views_by_product.get(name) else None
+            ),
         }
         for name in product_names
     ], key=lambda p: (-p['sales'], -p['cart_adds'], -p['views']))[:10]
+
+    # --- Vista → carrito (agregado, todos los productos) ---
+    total_product_views = sum(views_by_product.values())
+    total_product_cart_adds = sum(adds_by_product.values())
+    view_to_cart_rate = (
+        round(total_product_cart_adds / total_product_views * 100, 1) if total_product_views else 0
+    )
 
     # --- Ticket promedio (AOV) y reparto de ingresos por canal ---
     avg_order_value = (float(combined_revenue) / combined_sales_count) if combined_sales_count else 0
@@ -225,12 +311,17 @@ def build_dashboard_context(start_dt, end_dt):
     hourly_counts = [hour_counter.get(h, 0) for h in range(24)]
 
     # --- Páginas más vistas (con tiempo promedio) ---
+    # Solo se muestran las rutas del sistema de compras (inicio, menú, carrito,
+    # checkout, confirmación): son las únicas con page_label asignado por el
+    # middleware (ver PAGE_LABELS); el resto de rutas rastreadas se excluye.
+    label_to_view = {label: view_name for view_name, label in PAGE_LABELS.items()}
     pages_qs = (PageView.objects.filter(entered_at__range=(start_dt, end_dt), session__is_bot=False)
-                .values('path').annotate(views=Count('id'), avg_dur=Avg('duration_seconds'),
-                                         label=Max('page_label')).order_by('-views')[:10])
+                .exclude(page_label='')
+                .values('page_label').annotate(views=Count('id'), avg_dur=Avg('duration_seconds'))
+                .order_by('-views')[:10])
     top_pages = [{
-        'path': r['path'],
-        'label': r['label'] or r['path'],
+        'path': _current_route(label_to_view.get(r['page_label'], '')) or '—',
+        'label': r['page_label'],
         'views': r['views'],
         'avg_dur': round(r['avg_dur'], 1) if r['avg_dur'] is not None else None,
     } for r in pages_qs]
@@ -249,17 +340,21 @@ def build_dashboard_context(start_dt, end_dt):
         'combined_sales_count': combined_sales_count,
         'web_revenue': float(web_revenue),
         'whatsapp_revenue': float(whatsapp_revenue),
-        'web_sales_count': web_orders.count(),
-        'whatsapp_sales_count': whatsapp_sales.count(),
+        'instagram_revenue': float(instagram_revenue),
+        'web_sales_count': web_sales_count,
+        'whatsapp_sales_count': whatsapp_sales_count,
+        'instagram_sales_count': instagram_sales_count,
         'avg_order_value': round(avg_order_value, 2),
         'conversion_rate': round(conversion_rate, 1),
         'cart_remove_total': cart_remove_total,
         'bounce_rate': round(bounce_rate, 1),
+        'view_to_cart_rate': view_to_cart_rate,
         'funnel_labels': [f['label'] for f in funnel],
         'funnel_values': [f['value'] for f in funnel],
         'sales_dates': sales_dates,
         'web_sales_series': web_series,
         'whatsapp_sales_series': whatsapp_series,
+        'instagram_sales_series': instagram_series,
         'combined_sales_series': combined_series,
         'visit_dates': visit_dates,
         'visit_counts': visit_counts,

@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const salesDates = readJson('data-sales-dates');
   const webSales = readJson('data-web-sales');
   const whatsappSales = readJson('data-whatsapp-sales');
+  const instagramSales = readJson('data-instagram-sales');
   const combinedSales = readJson('data-combined-sales');
   const sourceLabels = readJson('data-source-labels');
   const sourceValues = readJson('data-source-values');
@@ -63,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const igClicks = readJson('data-ig-clicks');
   const webRevenue = readJson('data-web-revenue');
   const whatsappRevenue = readJson('data-whatsapp-revenue');
+  const instagramRevenue = readJson('data-instagram-revenue');
 
   // Relleno degradado suave para líneas de área.
   function areaFill(ctx, hex) {
@@ -102,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         datasets: [
           { label: 'Web', data: webSales, borderColor: AMBER, backgroundColor: AMBER, tension: 0.35, borderWidth: 2, pointRadius: 0, pointHoverRadius: 5 },
           { label: 'WhatsApp', data: whatsappSales, borderColor: GREEN, backgroundColor: GREEN, tension: 0.35, borderWidth: 2, pointRadius: 0, pointHoverRadius: 5 },
+          { label: 'Instagram', data: instagramSales, borderColor: '#c1443f', backgroundColor: '#c1443f', tension: 0.35, borderWidth: 2, pointRadius: 0, pointHoverRadius: 5 },
           { label: 'Combinado', data: combinedSales, borderColor: BROWN, backgroundColor: BROWN, tension: 0.35, borderDash: [5, 4], borderWidth: 2, pointRadius: 0, pointHoverRadius: 5 },
         ],
       },
@@ -196,12 +199,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Ingresos por canal (dona) ---
   const revenueEl = document.getElementById('chart-revenue');
-  if (revenueEl && hasData([webRevenue, whatsappRevenue])) {
+  if (revenueEl && hasData([webRevenue, whatsappRevenue, instagramRevenue])) {
     new Chart(revenueEl, {
       type: 'doughnut',
       data: {
-        labels: ['Web', 'WhatsApp'],
-        datasets: [{ data: [webRevenue, whatsappRevenue], backgroundColor: [AMBER, GREEN], borderColor: '#fff', borderWidth: 2 }],
+        labels: ['Web', 'WhatsApp', 'Instagram'],
+        datasets: [{ data: [webRevenue, whatsappRevenue, instagramRevenue], backgroundColor: [AMBER, GREEN, '#c1443f'], borderColor: '#fff', borderWidth: 2 }],
       },
       options: {
         cutout: '60%',

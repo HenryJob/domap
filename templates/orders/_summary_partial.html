@@ -2,21 +2,30 @@
 <h5 class="mb-3">Resumen de tu pedido</h5>
 {% for line in cart_lines %}
   <div class="cart-line js-cart-line" data-line-id="{{ line.line_id }}">
-    <div class="d-flex justify-content-between">
-      <strong>{{ line.product.name }}</strong>
-      <div class="text-end">{{ line.line_total|soles }}</div>
-    </div>
-    {% for extra, qty in line.extras %}
-      <div class="small text-muted">+ {{ qty }}x {{ extra.name }} ({{ extra.price|soles }} c/u)</div>
-    {% endfor %}
-    {% if line.notes %}<div class="small text-muted fst-italic">"{{ line.notes }}"</div>{% endif %}
-    <div class="d-flex align-items-center justify-content-between mt-2">
-      <div class="qty-stepper">
-        <button type="button" class="qty-btn js-line-qty-decrease">−</button>
-        <span class="qty-value">{{ line.quantity }}</span>
-        <button type="button" class="qty-btn js-line-qty-increase">+</button>
+    <div class="d-flex gap-2">
+      {% if line.product.image %}
+        <img src="{{ line.product.image.url }}" alt="{{ line.product.name }}" class="cart-line-img">
+      {% else %}
+        <img src="https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=100&q=80" alt="{{ line.product.name }}" class="cart-line-img">
+      {% endif %}
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between">
+          <strong>{{ line.product.name }}</strong>
+          <div class="text-end">{{ line.line_total|soles }}</div>
+        </div>
+        {% for extra, qty in line.extras %}
+          <div class="small text-muted">+ {{ qty }}x {{ extra.name }} ({{ extra.price|soles }} c/u)</div>
+        {% endfor %}
+        {% if line.notes %}<div class="small text-muted fst-italic">"{{ line.notes }}"</div>{% endif %}
+        <div class="d-flex align-items-center justify-content-between mt-2">
+          <div class="qty-stepper">
+            <button type="button" class="qty-btn js-line-qty-decrease">−</button>
+            <span class="qty-value">{{ line.quantity }}</span>
+            <button type="button" class="qty-btn js-line-qty-increase">+</button>
+          </div>
+          <button type="button" class="btn-remove-line js-line-remove" title="Eliminar" aria-label="Eliminar producto">✕</button>
+        </div>
       </div>
-      <button type="button" class="btn-remove-line js-line-remove" title="Eliminar" aria-label="Eliminar producto">✕</button>
     </div>
   </div>
 {% endfor %}

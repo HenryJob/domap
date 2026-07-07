@@ -3,9 +3,16 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from .models import (
-    Order, OrderItem, OrderItemExtra, ManualSale, ManualSaleItem, WhatsAppConnection,
+    Order, OrderItem, OrderItemExtra, ManualSale, ManualSaleItem, WhatsAppConnection, DeliveryZone,
 )
 from .whatsapp import connection_context
+
+
+@admin.register(DeliveryZone)
+class DeliveryZoneAdmin(admin.ModelAdmin):
+    list_display = ('name', 'fee', 'active')
+    list_editable = ('fee', 'active')
+    search_fields = ('name',)
 
 
 class OrderItemExtraInline(admin.TabularInline):
@@ -20,7 +27,7 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer_name', 'order_type', 'status', 'total', 'created_at')
+    list_display = ('id', 'customer_name', 'order_type', 'delivery_zone', 'status', 'total', 'created_at')
     list_editable = ('status',)
     list_filter = ('status', 'order_type', 'payment_method')
     search_fields = ('customer_name', 'phone', 'session_key')
@@ -40,8 +47,8 @@ class ManualSaleItemInline(admin.TabularInline):
 
 @admin.register(ManualSale)
 class ManualSaleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer_name', 'sale_date', 'total_amount', 'session_reference', 'logged_by')
-    list_filter = ('sale_date',)
+    list_display = ('id', 'channel', 'customer_name', 'sale_date', 'total_amount', 'session_reference', 'logged_by')
+    list_filter = ('channel', 'sale_date')
     search_fields = ('customer_name', 'phone', 'session_reference')
     inlines = [ManualSaleItemInline]
 

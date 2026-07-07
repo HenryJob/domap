@@ -1,0 +1,31 @@
+{% extends 'panel/_base.html' %}
+{% load widget_tweaks %}
+{% block title %}{% if zone %}Editar zona{% else %}Nueva zona{% endif %}{% endblock %}
+{% block panel_content %}
+<h2 class="dash-section-title"><i class="bi bi-geo-alt"></i> {% if zone %}Editar {{ zone.name }}{% else %}Nueva zona de delivery{% endif %}</h2>
+<div class="chart-card" style="max-width: 480px;">
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label">Nombre del distrito</label>
+        {{ form.name|add_class:"form-control" }}
+      </div>
+      <div class="col-6">
+        <label class="form-label">Costo de delivery (S/)</label>
+        {{ form.fee|add_class:"form-control" }}
+      </div>
+      <div class="col-6">
+        <div class="form-check mt-4">
+          {{ form.active|add_class:"form-check-input" }}
+          <label class="form-check-label" for="{{ form.active.id_for_label }}">Activa</label>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 d-flex gap-2">
+      <button type="submit" class="btn-morde-amber"><i class="bi bi-check-lg"></i> Guardar</button>
+      <a href="{% url 'panel:zone_list' %}" class="btn-morde-light bg-white">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

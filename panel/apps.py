@@ -1,6 +1,7 @@
 from django.apps import AppConfig
 
 
-class AccountsConfig(AppConfig):
+class PanelConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'accounts'
+    name = 'panel'
+    verbose_name = 'Panel administrativo'

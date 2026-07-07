@@ -8,6 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
   <link href="{% static 'css/morde.css' %}?v={{ STATIC_VERSION }}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
 <body class="dash-body">
@@ -15,253 +16,30 @@
     <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
       <span class="morde-logo"><i class="bi bi-graph-up-arrow me-1"></i> Panel de analítica</span>
       <div class="d-flex gap-2">
-        <a href="{% url 'orders:manual_sale_list' %}" class="btn-morde-light bg-white btn-sm"><i class="bi bi-whatsapp"></i> Ventas WhatsApp</a>
+        <a href="{% url 'orders:manual_sale_list' %}" class="btn-morde-light bg-white btn-sm"><i class="bi bi-whatsapp"></i> Ventas manuales</a>
         <a href="{% url 'core:home' %}" class="btn-morde-light bg-white btn-sm"><i class="bi bi-arrow-left"></i> Volver al sitio</a>
       </div>
     </div>
   </header>
 
   <div class="container pb-5">
-
-    <!-- Filtros -->
-    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
-      <div>
-        <div class="small text-muted mb-1">Rangos rápidos</div>
-        <div class="dash-presets">
-          {% for p in presets %}
-            <a href="?start={{ p.start }}&end={{ p.end }}" class="dash-preset {% if p.active %}active{% endif %}">{{ p.label }}</a>
-          {% endfor %}
-        </div>
-      </div>
-      <form method="get" class="d-flex gap-2 align-items-end">
-        <div>
-          <label class="form-label small mb-1">Desde</label>
-          <input type="date" name="start" value="{{ start|date:'Y-m-d' }}" class="form-control form-control-sm">
-        </div>
-        <div>
-          <label class="form-label small mb-1">Hasta</label>
-          <input type="date" name="end" value="{{ end|date:'Y-m-d' }}" class="form-control form-control-sm">
-        </div>
-        <button type="submit" class="btn-morde-amber btn-sm"><i class="bi bi-funnel"></i> Filtrar</button>
-      </form>
-    </div>
-    <p class="small text-muted mb-4">Mostrando <strong>{{ start|date:'d M Y' }} – {{ end|date:'d M Y' }}</strong> ({{ range_days }} día{{ range_days|pluralize:"s" }}). Los bots están excluidos de todas las métricas.</p>
-
-    <!-- ===================== RESUMEN (KPIs) ===================== -->
-    <section class="dash-section">
-      <h2 class="dash-section-title"><i class="bi bi-speedometer2"></i> Resumen del periodo</h2>
-      <div class="row g-3">
-        <div class="col-6 col-lg-3">
-          <div class="stat-tile">
-            <div class="stat-head"><span class="stat-label">Visitas</span><span class="stat-icon"><i class="bi bi-people"></i></span></div>
-            <div class="stat-value">{{ visits }}</div>
-            <div class="stat-sub">visitantes únicos (sin bots)</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="stat-tile accent-green">
-            <div class="stat-head"><span class="stat-label">Ingresos totales</span><span class="stat-icon"><i class="bi bi-cash-coin"></i></span></div>
-            <div class="stat-value sm">{{ combined_revenue|soles }}</div>
-            <div class="stat-sub">Web {{ web_revenue|soles }} · WA {{ whatsapp_revenue|soles }}</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="stat-tile accent-blue">
-            <div class="stat-head"><span class="stat-label">Conversión</span><span class="stat-icon"><i class="bi bi-bullseye"></i></span></div>
-            <div class="stat-value">{{ conversion_rate }}%</div>
-            <div class="stat-sub">{{ combined_sales_count }} venta{{ combined_sales_count|pluralize:"s" }} / {{ visits }} visitas</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="stat-tile accent-purple">
-            <div class="stat-head"><span class="stat-label">Ticket promedio</span><span class="stat-icon"><i class="bi bi-receipt"></i></span></div>
-            <div class="stat-value sm">{{ avg_order_value|soles }}</div>
-            <div class="stat-sub">por venta (web + WhatsApp)</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="stat-tile">
-            <div class="stat-head"><span class="stat-label">Tiempo en página</span><span class="stat-icon"><i class="bi bi-clock-history"></i></span></div>
-            <div class="stat-value">{{ avg_duration }}s</div>
-            <div class="stat-sub">promedio · mediana {{ median_duration }}s</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="stat-tile accent-red">
-            <div class="stat-head"><span class="stat-label">Rebote</span><span class="stat-icon"><i class="bi bi-box-arrow-right"></i></span></div>
-            <div class="stat-value">{{ bounce_rate }}%</div>
-            <div class="stat-sub">salieron viendo 1 sola página</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="stat-tile accent-red">
-            <div class="stat-head"><span class="stat-label">Carrito abandonado</span><span class="stat-icon"><i class="bi bi-cart-x"></i></span></div>
-            <div class="stat-value">{{ abandonment_rate }}%</div>
-            <div class="stat-sub">{{ abandoned_count }} de {{ abandonment_candidates }} (&gt;{{ abandonment_window_minutes }} min)</div>
-          </div>
-        </div>
-        <div class="col-6 col-lg-3">
-          <div class="stat-tile accent-green">
-            <div class="stat-head"><span class="stat-label">Ventas</span><span class="stat-icon"><i class="bi bi-bag-check"></i></span></div>
-            <div class="stat-value">{{ combined_sales_count }}</div>
-            <div class="stat-sub">Web {{ web_sales_count }} · WhatsApp {{ whatsapp_sales_count }}</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== TENDENCIAS ===================== -->
-    <section class="dash-section">
-      <h2 class="dash-section-title"><i class="bi bi-graph-up"></i> Tendencias</h2>
-      <div class="row g-3">
-        <div class="col-lg-6">
-          <div class="chart-card">
-            <h6>Visitas en el tiempo</h6>
-            <div class="chart-box"><canvas id="chart-visits"></canvas></div>
-          </div>
-        </div>
-        <div class="col-lg-6">
-          <div class="chart-card">
-            <h6>Ventas en el tiempo (web + WhatsApp)</h6>
-            <div class="chart-box"><canvas id="chart-sales"></canvas></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== ADQUISICIÓN ===================== -->
-    <section class="dash-section">
-      <h2 class="dash-section-title"><i class="bi bi-signpost-split"></i> Adquisición y audiencia</h2>
-      <div class="row g-3">
-        <div class="col-md-4">
-          <div class="chart-card">
-            <h6>Fuentes de tráfico</h6>
-            <div class="chart-box"><canvas id="chart-sources"></canvas></div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="chart-card">
-            <h6>Dispositivos</h6>
-            <div class="chart-box"><canvas id="chart-devices"></canvas></div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="chart-card">
-            <h6>Actividad por hora del día</h6>
-            <div class="chart-box"><canvas id="chart-hours"></canvas></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== CONVERSIÓN Y COMPORTAMIENTO ===================== -->
-    <section class="dash-section">
-      <h2 class="dash-section-title"><i class="bi bi-funnel"></i> Conversión y comportamiento</h2>
-      <div class="row g-3">
-        <div class="col-lg-4">
-          <div class="chart-card">
-            <h6>Embudo de conversión (web)</h6>
-            <div class="chart-box"><canvas id="chart-funnel"></canvas></div>
-          </div>
-        </div>
-        <div class="col-lg-4">
-          <div class="chart-card">
-            <h6>Canal preferido (clics para pedir)</h6>
-            <div class="chart-box"><canvas id="chart-channel"></canvas></div>
-            <p class="small text-muted text-center mb-0 mt-2">
-              WhatsApp {{ whatsapp_clicks_total }} ({{ whatsapp_click_share }}%) · Instagram {{ instagram_clicks_total }} ({{ instagram_click_share }}%)
-            </p>
-          </div>
-        </div>
-        <div class="col-lg-4">
-          <div class="chart-card">
-            <h6>Carrito y favoritos</h6>
-            <div class="chart-box"><canvas id="chart-cart-wishlist"></canvas></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===================== INGRESOS Y CONTENIDO ===================== -->
-    <section class="dash-section">
-      <h2 class="dash-section-title"><i class="bi bi-trophy"></i> Ingresos y contenido</h2>
-      <div class="row g-3">
-        <div class="col-lg-4">
-          <div class="chart-card">
-            <h6>Ingresos por canal</h6>
-            <div class="chart-box"><canvas id="chart-revenue"></canvas></div>
-          </div>
-        </div>
-        <div class="col-lg-8">
-          <div class="chart-card">
-            <h6>Productos más populares</h6>
-            <div class="table-responsive">
-              <table class="dash-table">
-                <thead><tr><th>Producto</th><th class="num">Vistas</th><th class="num">Al carrito</th><th class="num">Favoritos</th><th class="num">Vendidos</th></tr></thead>
-                <tbody>
-                  {% for p in top_products %}
-                    <tr>
-                      <td><span class="dash-rank">{{ forloop.counter }}</span>{{ p.name }}</td>
-                      <td class="num">{{ p.views }}</td>
-                      <td class="num">{{ p.cart_adds }}</td>
-                      <td class="num">{{ p.wishlist }}</td>
-                      <td class="num"><strong>{{ p.sales }}</strong></td>
-                    </tr>
-                  {% empty %}
-                    <tr><td colspan="5" class="text-muted text-center py-3">Sin datos en este rango.</td></tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <div class="col-12">
-          <div class="chart-card">
-            <h6>Páginas más vistas</h6>
-            <div class="table-responsive">
-              <table class="dash-table">
-                <thead><tr><th>Página</th><th>Ruta</th><th class="num">Vistas</th><th class="num">Tiempo prom.</th></tr></thead>
-                <tbody>
-                  {% for pg in top_pages %}
-                    <tr>
-                      <td><span class="dash-rank">{{ forloop.counter }}</span>{{ pg.label }}</td>
-                      <td class="text-muted small">{{ pg.path }}</td>
-                      <td class="num">{{ pg.views }}</td>
-                      <td class="num">{% if pg.avg_dur %}{{ pg.avg_dur }}s{% else %}—{% endif %}</td>
-                    </tr>
-                  {% empty %}
-                    <tr><td colspan="4" class="text-muted text-center py-3">Sin datos en este rango.</td></tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    {% include 'analytics/_dashboard_content.html' %}
   </div>
 
-  {{ visit_dates|json_script:"data-visit-dates" }}
-  {{ visit_counts|json_script:"data-visit-counts" }}
-  {{ cart_add_total|json_script:"data-cart-add-total" }}
-  {{ cart_remove_total|json_script:"data-cart-remove-total" }}
-  {{ wishlist_add_total|json_script:"data-wishlist-add-total" }}
-  {{ funnel_labels|json_script:"data-funnel-labels" }}
-  {{ funnel_values|json_script:"data-funnel-values" }}
-  {{ sales_dates|json_script:"data-sales-dates" }}
-  {{ web_sales_series|json_script:"data-web-sales" }}
-  {{ whatsapp_sales_series|json_script:"data-whatsapp-sales" }}
-  {{ combined_sales_series|json_script:"data-combined-sales" }}
-  {{ source_labels|json_script:"data-source-labels" }}
-  {{ source_values|json_script:"data-source-values" }}
-  {{ device_labels|json_script:"data-device-labels" }}
-  {{ device_values|json_script:"data-device-values" }}
-  {{ hourly_counts|json_script:"data-hourly-counts" }}
-  {{ whatsapp_clicks_total|json_script:"data-wa-clicks" }}
-  {{ instagram_clicks_total|json_script:"data-ig-clicks" }}
-  {{ web_revenue|json_script:"data-web-revenue" }}
-  {{ whatsapp_revenue|json_script:"data-whatsapp-revenue" }}
-
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!window.flatpickr) return;
+      if (flatpickr.l10ns && flatpickr.l10ns.es) flatpickr.localize(flatpickr.l10ns.es);
+      flatpickr('.js-date-picker', {
+        dateFormat: 'Y-m-d',
+        altInput: true,
+        altFormat: 'j M Y',
+        disableMobile: true,
+      });
+    });
+  </script>
   <script src="{% static 'js/dashboard-charts.js' %}?v={{ STATIC_VERSION }}"></script>
 </body>
 </html>

@@ -1,0 +1,52 @@
+{% extends 'panel/_base.html' %}
+{% block title %}Inicio{% endblock %}
+{% block panel_content %}
+<h2 class="dash-section-title"><i class="bi bi-house"></i> Resumen</h2>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <a href="{% url 'panel:product_list' %}" class="text-decoration-none">
+      <div class="stat-tile">
+        <div class="stat-head"><span class="stat-label">Productos</span><span class="stat-icon"><i class="bi bi-egg-fried"></i></span></div>
+        <div class="stat-value">{{ product_count }}</div>
+        <div class="stat-sub">en el catálogo</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{% url 'panel:order_list' %}?status=pending" class="text-decoration-none">
+      <div class="stat-tile accent-red">
+        <div class="stat-head"><span class="stat-label">Pedidos pendientes</span><span class="stat-icon"><i class="bi bi-bag-check"></i></span></div>
+        <div class="stat-value">{{ pending_orders }}</div>
+        <div class="stat-sub">por confirmar</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{% url 'panel:zone_list' %}" class="text-decoration-none">
+      <div class="stat-tile accent-blue">
+        <div class="stat-head"><span class="stat-label">Zonas activas</span><span class="stat-icon"><i class="bi bi-geo-alt"></i></span></div>
+        <div class="stat-value">{{ zone_count }}</div>
+        <div class="stat-sub">de delivery</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{% url 'panel:whatsapp' %}" class="text-decoration-none">
+      <div class="stat-tile accent-green">
+        <div class="stat-head"><span class="stat-label">WhatsApp</span><span class="stat-icon"><i class="bi bi-whatsapp"></i></span></div>
+        <div class="stat-value sm">{% if whatsapp_state == 'open' %}Conectado{% else %}Desconectado{% endif %}</div>
+        <div class="stat-sub">número de la tienda</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6 col-lg-3">
+    <a href="{% url 'panel:product_create' %}" class="btn-morde-amber w-100"><i class="bi bi-plus-lg"></i> Nuevo producto</a>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <a href="{% url 'panel:zone_create' %}" class="btn-morde-light bg-white w-100"><i class="bi bi-plus-lg"></i> Nueva zona</a>
+  </div>
+</div>
+{% endblock %}

@@ -22,14 +22,21 @@
       <div class="product-card p-4 mt-4 text-start order-confirm-summary">
         <div class="order-confirm-items">
           {% for item in order.items.all %}
-            <div class="mb-2">
-              <div class="d-flex justify-content-between gap-2">
-                <span>{{ item.quantity }} x {{ item.product.name }}</span>
-                <span class="text-nowrap">{{ item.line_total|soles }}</span>
+            <div class="mb-2 d-flex gap-2">
+              {% if item.product.image %}
+                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="cart-line-img">
+              {% else %}
+                <img src="https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=100&q=80" alt="{{ item.product.name }}" class="cart-line-img">
+              {% endif %}
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between gap-2">
+                  <span>{{ item.quantity }} x {{ item.product.name }}</span>
+                  <span class="text-nowrap">{{ item.line_total|soles }}</span>
+                </div>
+                {% for extra in item.extras.all %}
+                  <div class="small text-muted">+ {{ extra.quantity }}x {{ extra.extra.name }} ({{ extra.unit_price|soles }} c/u)</div>
+                {% endfor %}
               </div>
-              {% for extra in item.extras.all %}
-                <div class="small text-muted">+ {{ extra.quantity }}x {{ extra.extra.name }} ({{ extra.unit_price|soles }} c/u)</div>
-              {% endfor %}
             </div>
           {% endfor %}
         </div>
@@ -63,7 +70,7 @@
     </div>
 
     <div class="col-lg-5">
-      <form method="post" class="product-card p-4">
+      <form method="post" class="product-card p-4 js-checkout-form" novalidate>
         {% csrf_token %}
         <div class="mb-3">
           <h5 class="mb-1"><i class="bi bi-bag-heart text-amber"></i> Completa tu pedido aquí mismo</h5>
@@ -72,19 +79,15 @@
         <div class="row g-3">
           <div class="col-12">
             <label class="form-label">Nombre completo</label>
-            {{ form.customer_name|add_class:"form-control" }}
-            {% if form.customer_name.errors %}<div class="small text-danger mt-1">{{ form.customer_name.errors|join:", " }}</div>{% endif %}
+            {{ form.customer_name|add_class:"form-control js-field-required" }}
+            <div class="small text-danger mt-1 js-field-error" {% if not form.customer_name.errors %}hidden{% endif %}>{{ form.customer_name.errors|join:", "|default:"Ingresa tu nombre completo." }}</div>
           </div>
           <div class="col-12">
             <label class="form-label">Teléfono</label>
-            {{ form.phone|add_class:"form-control" }}
-            {% if form.phone.errors %}<div class="small text-danger mt-1">{{ form.phone.errors|join:", " }}</div>{% endif %}
+            {{ form.phone|add_class:"form-control js-field-required" }}
+            <div class="small text-danger mt-1 js-field-error" {% if not form.phone.errors %}hidden{% endif %}>{{ form.phone.errors|join:", "|default:"Ingresa un teléfono de contacto." }}</div>
           </div>
-          <div class="col-12">
-            <label class="form-label">Email (opcional, para tu confirmación)</label>
-            {{ form.email|add_class:"form-control" }}
-            {% if form.email.errors %}<div class="small text-danger mt-1">{{ form.email.errors|join:", " }}</div>{% endif %}
-          </div>
+          {{ form.email }}
           <div class="col-12">
             <label class="form-label d-block">Tipo de pedido</label>
             <div class="toggle-options">
@@ -95,10 +98,15 @@
             </div>
             {% if form.order_type.errors %}<div class="small text-danger mt-1">{{ form.order_type.errors|join:", " }}</div>{% endif %}
           </div>
-          <div class="col-12">
+          <div class="col-12 js-delivery-zone-field">
+            <label class="form-label">Distrito (Lima Metropolitana)</label>
+            {{ form.delivery_zone|add_class:"form-control js-delivery-zone js-field-required-if-delivery" }}
+            <div class="small text-danger mt-1 js-field-error" {% if not form.delivery_zone.errors %}hidden{% endif %}>{{ form.delivery_zone.errors|join:", "|default:"Selecciona tu distrito." }}</div>
+          </div>
+          <div class="col-12 js-delivery-zone-field">
             <label class="form-label">Dirección o punto de referencia</label>
-            {{ form.address|add_class:"form-control" }}
-            {% if form.address.errors %}<div class="small text-danger mt-1">{{ form.address.errors|join:", " }}</div>{% endif %}
+            {{ form.address|add_class:"form-control js-field-required-if-delivery" }}
+            <div class="small text-danger mt-1 js-field-error" {% if not form.address.errors %}hidden{% endif %}>{{ form.address.errors|join:", "|default:"La dirección es obligatoria para delivery." }}</div>
           </div>
           <div class="col-12 pt-1">
             <label class="form-label d-block mb-1 fw-semibold"><i class="bi bi-calendar-heart me-1 text-amber"></i>¿Para cuándo lo quieres?</label>
@@ -166,6 +174,7 @@
 {% block extra_css %}
 {% if not order %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/styles/choices.min.css">
 {% endif %}
 {% endblock %}
 
@@ -173,6 +182,7 @@
 {% if not order %}
 <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js@10.2.0/public/assets/scripts/choices.min.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     if (!window.flatpickr) return;
@@ -199,6 +209,19 @@
       maxTime: '21:00',
       disableMobile: true,
     });
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var zoneEl = document.querySelector('.js-delivery-zone');
+    if (zoneEl && window.Choices) {
+      new Choices(zoneEl, {
+        searchEnabled: true,
+        searchPlaceholderValue: 'Busca tu distrito...',
+        noResultsText: 'No encontramos ese distrito',
+        itemSelectText: '',
+        shouldSort: false,
+      });
+    }
   });
 </script>
 <script src="{% static 'js/cart.js' %}?v={{ STATIC_VERSION }}"></script>

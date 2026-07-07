@@ -1,0 +1,39 @@
+{% extends 'panel/_base.html' %}
+{% load widget_tweaks %}
+{% block title %}{% if extra %}Editar extra{% else %}Nuevo extra{% endif %}{% endblock %}
+{% block panel_content %}
+<h2 class="dash-section-title"><i class="bi bi-plus-circle"></i> {% if extra %}Editar {{ extra.name }}{% else %}Nuevo extra{% endif %}</h2>
+<div class="chart-card" style="max-width: 520px;">
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-8">
+        <label class="form-label">Nombre</label>
+        {{ form.name|add_class:"form-control" }}
+      </div>
+      <div class="col-4">
+        <label class="form-label">Emoji</label>
+        {{ form.icon_emoji|add_class:"form-control" }}
+      </div>
+      <div class="col-6">
+        <label class="form-label">Precio (S/)</label>
+        {{ form.price|add_class:"form-control" }}
+      </div>
+      <div class="col-6">
+        <label class="form-label">Orden</label>
+        {{ form.display_order|add_class:"form-control" }}
+      </div>
+      <div class="col-12">
+        <div class="form-check">
+          {{ form.is_active|add_class:"form-check-input" }}
+          <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Activo</label>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 d-flex gap-2">
+      <button type="submit" class="btn-morde-amber"><i class="bi bi-check-lg"></i> Guardar</button>
+      <a href="{% url 'panel:extra_list' %}" class="btn-morde-light bg-white">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

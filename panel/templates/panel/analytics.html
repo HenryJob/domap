@@ -1,0 +1,10 @@
+{% extends 'panel/_base.html' %}
+{% load static %}
+{% block title %}Analítica{% endblock %}
+{% block panel_content %}
+  {% include 'analytics/_dashboard_content.html' %}
+{% endblock %}
+{% block extra_js %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="{% static 'js/dashboard-charts.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'panel/_base.html' %}
+{% block title %}Zonas de delivery{% endblock %}
+{% block panel_content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="dash-section-title mb-0"><i class="bi bi-geo-alt"></i> Zonas de delivery</h2>
+  <a href="{% url 'panel:zone_create' %}" class="btn-morde-amber btn-sm"><i class="bi bi-plus-lg"></i> Nueva zona</a>
+</div>
+
+<form method="get" class="panel-filter-bar mb-3">
+  <div class="field">
+    <label>Buscar</label>
+    <input type="text" name="q" value="{{ q }}" placeholder="Nombre de la zona" class="form-control form-control-sm">
+  </div>
+  <div class="field field-sm">
+    <label>Activa</label>
+    <select name="is_active" class="form-select form-select-sm">
+      <option value="">Todas</option>
+      <option value="1" {% if is_active == '1' %}selected{% endif %}>Sí</option>
+      <option value="0" {% if is_active == '0' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+  <div class="actions">
+    <button type="submit" class="btn-morde-amber btn-sm"><i class="bi bi-funnel"></i> Filtrar</button>
+    <a href="{% url 'panel:zone_list' %}" class="btn-morde-light bg-white btn-sm">Limpiar</a>
+  </div>
+</form>
+
+<div class="chart-card">
+  <div class="table-responsive">
+    <table class="dash-table">
+      <thead><tr><th>Zona</th><th>Costo</th><th>Activa</th><th></th></tr></thead>
+      <tbody>
+        {% for z in zones %}
+        <tr>
+          <td>{{ z.name }}</td>
+          <td>S/ {{ z.fee }}</td>
+          <td>{% if z.active %}<span class="badge bg-success">Sí</span>{% else %}<span class="badge bg-secondary">No</span>{% endif %}</td>
+          <td class="text-end">
+            <a href="{% url 'panel:zone_edit' z.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'panel:zone_delete' z.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-muted text-center py-3">No hay zonas todavía.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'panel/_pagination.html' %}
+</div>
+{% endblock %}

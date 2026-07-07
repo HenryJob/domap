@@ -19,9 +19,11 @@ WAFFLES = [
 
 COMBOS = [
     dict(name='Combo Mordé + bebida', description='Elige tu Mordé favorito y acompáñalo con una bebida natural.',
-         price=21.90, is_combo=True, display_order=7),
+         price=21.90, is_combo=True, display_order=7,
+         combo_products=['Mordé Clásico']),
     dict(name='Dúo Mordé', description='Elige 2 Mordés y disfruta en buena compañía.',
-         price=28.90, is_combo=True, display_order=8),
+         price=28.90, is_combo=True, display_order=8,
+         combo_products=['Mordé Chocolate', 'Mordé Frutas & Miel']),
 ]
 
 EXTRAS = [
@@ -30,6 +32,7 @@ EXTRAS = [
     dict(name='Banano', icon_emoji='🍌', price=2.00, display_order=3),
     dict(name='Chocolate', icon_emoji='🍫', price=2.00, display_order=4),
     dict(name='Granola', icon_emoji='🥣', price=2.00, display_order=5),
+    dict(name='Arándano', icon_emoji='🫐', price=2.00, display_order=6),
 ]
 
 
@@ -38,12 +41,21 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         created_count = 0
+        combo_links = {}
         for item in WAFFLES + COMBOS:
+            item = dict(item)
+            related_names = item.pop('combo_products', None)
             slug = slugify(item['name'])
-            _, created = Product.objects.update_or_create(
+            product, created = Product.objects.update_or_create(
                 slug=slug, defaults={**item, 'slug': slug},
             )
             created_count += created
+            if related_names is not None:
+                combo_links[product.pk] = related_names
+
+        for product_pk, related_names in combo_links.items():
+            related = Product.objects.filter(name__in=related_names)
+            Product.objects.get(pk=product_pk).combo_products.set(related)
 
         for item in EXTRAS:
             _, created = Extra.objects.update_or_create(

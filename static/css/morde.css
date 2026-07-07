@@ -407,13 +407,16 @@ a:hover .morde-logo {
   color: var(--color-brown);
   margin-bottom: 0.35rem;
 }
-.form-control {
+.form-control,
+.form-select {
   border-radius: 10px;
   border: 1.5px solid rgba(46,28,18,0.15);
   padding: 0.55rem 0.85rem;
+  color: var(--color-brown);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.form-control:focus {
+.form-control:focus,
+.form-select:focus {
   border-color: var(--color-amber);
   box-shadow: 0 0 0 0.2rem rgba(217,142,63,0.18);
 }
@@ -461,6 +464,49 @@ input.form-control[readonly].flatpickr-input {
 .flatpickr-calendar .flatpickr-time .flatpickr-am-pm:hover,
 .flatpickr-calendar .flatpickr-time .flatpickr-am-pm:focus {
   background: var(--color-cream-soft);
+}
+
+/* Tema Mordé para el select buscable de distrito (Choices.js), para que
+   luzca igual que los .form-control del resto del formulario. Los selectores
+   llevan el prefijo .choices para ganar en especificidad al CSS del CDN
+   (que se carga después de morde.css). */
+.choices {
+  margin-bottom: 0;
+}
+.choices .choices__inner {
+  border-radius: 10px;
+  border: 1.5px solid rgba(46,28,18,0.15);
+  background-color: #fff;
+  padding: 0.55rem 0.85rem;
+  min-height: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.choices.is-focused .choices__inner,
+.choices.is-open .choices__inner {
+  border-color: var(--color-amber);
+  box-shadow: 0 0 0 0.2rem rgba(217,142,63,0.18);
+}
+.choices__list--single {
+  padding: 0;
+}
+.choices__list--dropdown,
+.choices__list[aria-expanded] {
+  border-radius: 10px;
+  border-color: rgba(46,28,18,0.15);
+  font-family: var(--font-body);
+}
+.choices__list--dropdown .choices__input {
+  border-bottom-color: rgba(46,28,18,0.15);
+}
+.choices__list--dropdown .choices__item--selectable.is-highlighted,
+.choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
+  background-color: var(--color-cream-soft);
+}
+.choices__list--dropdown .choices__item--selectable.is-selected {
+  color: var(--color-amber-dark);
+  font-weight: 600;
 }
 
 /* Stepper de cantidad (producto y extras) */
@@ -517,6 +563,18 @@ input.form-control[readonly].flatpickr-input {
 }
 .cart-line:last-of-type {
   border-bottom: none;
+}
+.product-card img.cart-line-img {
+  width: 88px;
+  height: 88px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.cart-line .flex-grow-1,
+.order-confirm-items .flex-grow-1 {
+  min-width: 0;
 }
 .btn-remove-line {
   border: 1px solid transparent;
@@ -755,4 +813,108 @@ input.form-control[readonly].flatpickr-input {
   font-size: 0.75rem;
   font-weight: 700;
   margin-right: 0.5rem;
+}
+
+/* ==========================================================================
+   Panel administrativo (/panel/)
+   ========================================================================== */
+.panel-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: #fff;
+  border-radius: 14px;
+  padding: 0.6rem;
+  box-shadow: 0 4px 18px rgba(46,28,18,0.06);
+}
+.panel-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  color: var(--color-brown);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.panel-nav-link i {
+  color: var(--color-amber-dark);
+}
+.panel-nav-link:hover {
+  background: var(--color-cream-soft);
+}
+.panel-nav-link.active {
+  background: var(--color-amber);
+  color: #fff;
+}
+.panel-nav-link.active i {
+  color: #fff;
+}
+
+/* Barra de filtros de las listas del panel */
+.panel-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.6rem 0.75rem;
+  background: #fff;
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 4px 18px rgba(46,28,18,0.06);
+}
+.panel-filter-bar .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 0 1 160px;
+  min-width: 0;
+}
+.panel-filter-bar .field.field-sm {
+  flex-basis: 110px;
+}
+.panel-filter-bar .field label {
+  font-size: 0.72rem;
+  color: #9a8b7d;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+.panel-filter-bar .field-group {
+  display: flex;
+  gap: 0.5rem;
+  flex: 0 1 220px;
+}
+.panel-filter-bar .field-group .field {
+  flex: 1 1 0;
+}
+.panel-filter-bar .actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+/* Paginación de las tablas del panel, con la misma paleta que el resto del sitio */
+.panel-pagination .page-link {
+  border-color: rgba(46,28,18,0.15);
+  color: var(--color-brown);
+  border-radius: 8px;
+  margin: 0 0.15rem;
+}
+.panel-pagination .page-link:hover {
+  background-color: var(--color-cream-soft);
+  color: var(--color-brown);
+  border-color: var(--color-amber);
+}
+.panel-pagination .page-item.active .page-link {
+  background-color: var(--color-amber);
+  border-color: var(--color-amber);
+  color: #fff;
+}
+.panel-pagination .page-item.disabled .page-link {
+  color: #b8ab9e;
+  background-color: #fff;
+  border-color: rgba(46,28,18,0.1);
 }

@@ -1,7 +1,5 @@
 from decimal import Decimal
 
-from django.conf import settings
-
 from .emails import send_order_confirmation
 from .models import OrderItem, OrderItemExtra
 from .whatsapp import send_order_whatsapp
@@ -13,7 +11,8 @@ def place_order(request, form, cart):
     estar validado (form.is_valid() == True) antes de llamar esto."""
     lines = cart.lines()
     subtotal = cart.subtotal()
-    delivery_fee = Decimal(str(settings.DELIVERY_FEE)) if form.cleaned_data['order_type'] == 'delivery' else Decimal('0')
+    zone = form.cleaned_data.get('delivery_zone')
+    delivery_fee = zone.fee if form.cleaned_data['order_type'] == 'delivery' and zone else Decimal('0')
 
     order = form.save(commit=False)
     order.session_key = request.session.session_key or ''

@@ -1,0 +1,93 @@
+{% extends 'panel/_base.html' %}
+{% block title %}Pedidos{% endblock %}
+{% block panel_content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h2 class="dash-section-title mb-0"><i class="bi bi-bag-check"></i> Pedidos</h2>
+</div>
+
+<form method="get" class="panel-filter-bar mb-3">
+  <div class="field">
+    <label>Cliente</label>
+    <input type="text" name="q" value="{{ q }}" placeholder="Nombre" class="form-control form-control-sm">
+  </div>
+  <div class="field field-sm">
+    <label>Teléfono</label>
+    <input type="text" name="phone" value="{{ phone }}" placeholder="Teléfono" class="form-control form-control-sm">
+  </div>
+  <div class="field field-sm">
+    <label>Tipo</label>
+    <select name="order_type" class="form-select form-select-sm">
+      <option value="">Todos</option>
+      {% for value, label in order_type_choices %}
+        <option value="{{ value }}" {% if order_type == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field field-sm">
+    <label>Zona</label>
+    <select name="zone" class="form-select form-select-sm">
+      <option value="">Todas</option>
+      {% for z in zones %}
+        <option value="{{ z.pk }}" {% if zone_id == z.pk|stringformat:"s" %}selected{% endif %}>{{ z.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field field-sm">
+    <label>Estado</label>
+    <select name="status" class="form-select form-select-sm">
+      <option value="">Todos</option>
+      {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field-group">
+    <div class="field">
+      <label>Desde</label>
+      <input type="text" name="date_from" value="{{ date_from }}" placeholder="Cualquiera" autocomplete="off" class="form-control form-control-sm js-date-picker">
+    </div>
+    <div class="field">
+      <label>Hasta</label>
+      <input type="text" name="date_to" value="{{ date_to }}" placeholder="Cualquiera" autocomplete="off" class="form-control form-control-sm js-date-picker">
+    </div>
+  </div>
+  <div class="actions">
+    <button type="submit" class="btn-morde-amber btn-sm"><i class="bi bi-funnel"></i> Filtrar</button>
+    <a href="{% url 'panel:order_list' %}" class="btn-morde-light bg-white btn-sm">Limpiar</a>
+  </div>
+</form>
+
+<div class="chart-card">
+  <div class="table-responsive">
+    <table class="dash-table">
+      <thead>
+        <tr><th>#</th><th>Cliente</th><th>Teléfono</th><th>Tipo</th><th>Zona</th><th>Total</th><th>Estado</th><th>Fecha</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for o in orders %}
+        <tr>
+          <td>{{ o.id }}</td>
+          <td>{{ o.customer_name }}</td>
+          <td>{{ o.phone }}</td>
+          <td>{{ o.get_order_type_display }}</td>
+          <td>{{ o.delivery_zone.name|default:"—" }}</td>
+          <td class="num">S/ {{ o.total }}</td>
+          <td>
+            <span class="badge
+              {% if o.status == 'pending' %}bg-warning text-dark
+              {% elif o.status == 'confirmed' %}bg-info text-dark
+              {% elif o.status == 'completed' %}bg-success
+              {% else %}bg-secondary{% endif %}">{{ o.get_status_display }}</span>
+          </td>
+          <td class="text-muted small">{{ o.created_at|date:"d/m/Y H:i" }}</td>
+          <td class="text-end"><a href="{% url 'panel:order_detail' o.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-eye"></i></a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9" class="text-muted text-center py-3">No hay pedidos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'panel/_pagination.html' %}
+</div>
+{% endblock %}

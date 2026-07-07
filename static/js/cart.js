@@ -131,12 +131,33 @@ document.addEventListener('DOMContentLoaded', () => {
   // refresca por AJAX (no se recarga la página, para no perder lo que el
   // cliente ya escribió en el formulario de al lado).
   const summaryEl = document.getElementById('order-summary');
+  const zoneSelect = document.querySelector('.js-delivery-zone');
+
+  function selectedOrderType() {
+    return document.querySelector('input[name="order_type"]:checked')?.value;
+  }
 
   function refreshSummary() {
-    return fetch('/pedidos/resumen-parcial/').then((r) => r.text()).then((html) => {
+    const zoneId = selectedOrderType() === 'delivery' ? (zoneSelect?.value || '') : '';
+    const url = zoneId ? `/pedidos/resumen-parcial/?zone=${zoneId}` : '/pedidos/resumen-parcial/';
+    return fetch(url).then((r) => r.text()).then((html) => {
       summaryEl.innerHTML = html;
     });
   }
+
+  function toggleDeliveryFields() {
+    const isDelivery = selectedOrderType() === 'delivery';
+    document.querySelectorAll('.js-delivery-zone-field').forEach((el) => el.classList.toggle('d-none', !isDelivery));
+  }
+
+  document.querySelectorAll('input[name="order_type"]').forEach((radio) => {
+    radio.addEventListener('change', () => {
+      toggleDeliveryFields();
+      refreshSummary();
+    });
+  });
+  zoneSelect?.addEventListener('change', refreshSummary);
+  toggleDeliveryFields();
 
   summaryEl?.addEventListener('click', (event) => {
     const lineEl = event.target.closest('.js-cart-line');
@@ -161,6 +182,52 @@ document.addEventListener('DOMContentLoaded', () => {
         updateCartBadge(data.cart_count);
         refreshSummary();
       });
+    }
+  });
+
+  // --- Valida los campos obligatorios antes de dejar enviar el pedido ---
+  const checkoutForm = document.querySelector('.js-checkout-form');
+
+  function showFieldError(field, show) {
+    const wrapper = field.closest('.col-12');
+    const errorEl = wrapper?.querySelector('.js-field-error');
+    if (errorEl) errorEl.hidden = !show;
+    field.classList.toggle('is-invalid', show);
+  }
+
+  function validateCheckoutForm() {
+    let firstInvalid = null;
+    let isValid = true;
+
+    checkoutForm.querySelectorAll('.js-field-required').forEach((field) => {
+      const empty = !field.value.trim();
+      showFieldError(field, empty);
+      if (empty) {
+        isValid = false;
+        firstInvalid = firstInvalid || field;
+      }
+    });
+
+    if (selectedOrderType() === 'delivery') {
+      checkoutForm.querySelectorAll('.js-field-required-if-delivery').forEach((field) => {
+        const empty = !field.value.trim();
+        showFieldError(field, empty);
+        if (empty) {
+          isValid = false;
+          firstInvalid = firstInvalid || field;
+        }
+      });
+    }
+
+    if (firstInvalid) {
+      firstInvalid.closest('.js-delivery-zone-field, .col-12')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return isValid;
+  }
+
+  checkoutForm?.addEventListener('submit', (event) => {
+    if (!validateCheckoutForm()) {
+      event.preventDefault();
     }
   });
 });

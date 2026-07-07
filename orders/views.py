@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST
 from cart.cart import Cart
 from cart.services import summary_context
 from .forms import OrderLookupForm, ManualSaleForm, ManualSaleItemFormSet
-from .models import Order, ManualSale
+from .models import Order, ManualSale, DeliveryZone
 from .whatsapp import EvolutionClient, EvolutionError, connection_context, normalize_phone
 
 
@@ -19,7 +19,8 @@ def cart_summary_partial(request):
     sin recargar la página (y así no perder lo que el cliente ya escribió en
     el formulario de Completa tu pedido)."""
     cart = Cart(request)
-    return render(request, 'orders/_summary_partial.html', summary_context(cart))
+    zone = DeliveryZone.objects.filter(id=request.GET.get('zone'), active=True).first()
+    return render(request, 'orders/_summary_partial.html', summary_context(cart, zone))
 
 
 def checkout(request):
@@ -67,7 +68,7 @@ def manual_sale_create(request):
             formset = ManualSaleItemFormSet(request.POST, instance=sale)
             if formset.is_valid():
                 formset.save()
-            messages.success(request, 'Venta de WhatsApp registrada correctamente.')
+            messages.success(request, 'Venta registrada correctamente.')
             return redirect('orders:manual_sale_list')
         formset = ManualSaleItemFormSet(request.POST)
     else:

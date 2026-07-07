@@ -1,6 +1,7 @@
 PAGE_LABELS = {
     'core:home': 'Inicio',
     'catalog:menu': 'Menú',
+    'cart:cart_detail': 'Carrito',
     'orders:checkout': 'Pedidos',
     'orders:order_success': 'Confirmación',
 }

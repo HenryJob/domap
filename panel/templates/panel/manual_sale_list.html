@@ -1,0 +1,57 @@
+{% extends 'panel/_base.html' %}
+{% load morde_extras %}
+{% block title %}Ventas manuales{% endblock %}
+{% block panel_content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h2 class="dash-section-title mb-0"><i class="bi bi-chat-dots"></i> Ventas manuales (WhatsApp / Instagram)</h2>
+  <a href="{% url 'panel:manual_sale_create' %}" class="btn-morde-amber btn-sm"><i class="bi bi-plus-lg"></i> Nueva venta</a>
+</div>
+
+<form method="get" class="panel-filter-bar mb-3">
+  <div class="field field-sm">
+    <label>Canal</label>
+    <select name="channel" class="form-select form-select-sm">
+      <option value="">Todos</option>
+      {% for value, label in channel_choices %}
+        <option value="{{ value }}" {% if channel == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="actions">
+    <button type="submit" class="btn-morde-amber btn-sm"><i class="bi bi-funnel"></i> Filtrar</button>
+    <a href="{% url 'panel:manual_sale_list' %}" class="btn-morde-light bg-white btn-sm">Limpiar</a>
+  </div>
+</form>
+
+<div class="chart-card">
+  <div class="table-responsive">
+    <table class="dash-table">
+      <thead>
+        <tr><th>#</th><th>Canal</th><th>Cliente</th><th>Fecha</th><th>Monto</th><th>Código sesión</th><th>Registrado por</th></tr>
+      </thead>
+      <tbody>
+        {% for sale in sales %}
+        <tr>
+          <td>{{ sale.id }}</td>
+          <td>
+            {% if sale.channel == 'instagram' %}
+              <span class="badge" style="background:#c1447d;"><i class="bi bi-instagram"></i> Instagram</span>
+            {% else %}
+              <span class="badge" style="background:#25b358;"><i class="bi bi-whatsapp"></i> WhatsApp</span>
+            {% endif %}
+          </td>
+          <td>{{ sale.customer_name|default:'—' }}</td>
+          <td class="text-muted small">{{ sale.sale_date|date:'d/m/Y H:i' }}</td>
+          <td class="num">{{ sale.total_amount|soles }}</td>
+          <td>{{ sale.session_reference|default:'—' }}</td>
+          <td>{{ sale.logged_by|default:'—' }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-muted text-center py-3">Todavía no hay ventas registradas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% include 'panel/_pagination.html' %}
+</div>
+{% endblock %}

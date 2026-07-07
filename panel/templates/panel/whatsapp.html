@@ -1,0 +1,109 @@
+{% extends 'panel/_base.html' %}
+{% block title %}WhatsApp{% endblock %}
+{% block panel_content %}
+<h2 class="dash-section-title"><i class="bi bi-whatsapp"></i> WhatsApp</h2>
+
+{% if not enabled %}
+  <div class="alert alert-warning">
+    El envío automático está <strong>desactivado</strong>. Cuando termines de conectar el número,
+    pon <code>WHATSAPP_NOTIFY_ENABLED=True</code> en el archivo <code>.env</code> y reinicia el contenedor
+    <code>web</code> para que empiece a enviar los pedidos a los clientes.
+  </div>
+{% endif %}
+
+{% if error %}
+  <div class="alert alert-danger" id="wa-error">{{ error }}</div>
+{% endif %}
+
+<div class="chart-card text-center" style="max-width: 520px;">
+  <p class="text-muted mb-2">Instancia: <strong>{{ instance }}</strong></p>
+
+  <div id="wa-connected" class="{% if state != 'open' %}d-none{% endif %}">
+    <p class="fs-4 mb-3">✅ <strong>Número conectado</strong></p>
+    <p class="text-muted">Los pedidos hechos en la web se enviarán automáticamente al WhatsApp del cliente.</p>
+
+    <form method="post" action="{% url 'orders:whatsapp_test' %}" class="mt-3">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'panel:whatsapp' %}">
+      <label class="form-label small text-muted">Enviar un mensaje de prueba a un número:</label>
+      <div class="d-flex gap-2 justify-content-center flex-wrap">
+        <input type="text" name="phone" placeholder="Ej. 987 654 321" class="form-control" style="max-width: 220px;" required>
+        <button type="submit" class="btn-morde-amber">Enviar prueba</button>
+      </div>
+    </form>
+
+    <form method="post" action="{% url 'orders:whatsapp_logout' %}" class="mt-4"
+          onsubmit="return confirm('¿Desconectar el número actual?');">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'panel:whatsapp' %}">
+      <button type="submit" class="btn-morde-light bg-white">Desconectar</button>
+    </form>
+  </div>
+
+  <div id="wa-qr" class="{% if state == 'open' %}d-none{% endif %}">
+    <p class="mb-3">Abre <strong>WhatsApp</strong> en el teléfono del negocio →
+      <em>Dispositivos vinculados</em> → <em>Vincular un dispositivo</em> y escanea este código:</p>
+    {% if qr_base64 %}
+      <img id="wa-qr-img" src="{{ qr_base64 }}" alt="Código QR de WhatsApp"
+           style="max-width: 280px; width: 100%; height: auto;" class="my-2">
+    {% else %}
+      <div id="wa-qr-img-placeholder" class="text-muted my-4">Generando código QR…</div>
+    {% endif %}
+    <p class="text-muted small mt-3" id="wa-status">Esperando escaneo…</p>
+    <form method="post" action="{% url 'orders:whatsapp_restart' %}" class="mt-2">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'panel:whatsapp' %}">
+      <button type="submit" class="btn-morde-light bg-white">¿No aparece el QR? Generar uno nuevo</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const stateUrl = "{% url 'orders:whatsapp_state' %}";
+  const connectedEl = document.getElementById('wa-connected');
+  const qrEl = document.getElementById('wa-qr');
+  const statusEl = document.getElementById('wa-status');
+
+  function setImg(base64) {
+    let img = document.getElementById('wa-qr-img');
+    const ph = document.getElementById('wa-qr-img-placeholder');
+    if (!base64) return;
+    if (!img) {
+      img = document.createElement('img');
+      img.id = 'wa-qr-img';
+      img.alt = 'Código QR de WhatsApp';
+      img.style.maxWidth = '280px';
+      img.style.width = '100%';
+      img.style.height = 'auto';
+      img.className = 'my-2';
+      if (ph) ph.replaceWith(img); else qrEl.prepend(img);
+    }
+    img.src = base64;
+  }
+
+  async function poll() {
+    try {
+      const r = await fetch(stateUrl, { headers: { 'X-Requested-With': 'fetch' } });
+      const d = await r.json();
+      if (d.state === 'open') {
+        connectedEl.classList.remove('d-none');
+        qrEl.classList.add('d-none');
+        return;
+      }
+      qrEl.classList.remove('d-none');
+      connectedEl.classList.add('d-none');
+      if (d.qr_base64) setImg(d.qr_base64);
+      if (statusEl) statusEl.textContent = d.error ? d.error : 'Esperando escaneo…';
+    } catch (e) {
+      if (statusEl) statusEl.textContent = 'Reintentando…';
+    }
+    setTimeout(poll, 4000);
+  }
+
+  setTimeout(poll, 4000);
+})();
+</script>
+{% endblock %}

@@ -10,6 +10,7 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     list_filter = ('is_combo', 'is_customizable', 'is_featured', 'is_active')
     search_fields = ('name', 'description')
+    filter_horizontal = ('combo_products',)
 
 
 @admin.register(Extra)
